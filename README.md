@@ -4,13 +4,13 @@ A java library that helps you write your own secure network messaging system eff
 
 ## Features
 
-- Custom messages
+- custom messages
 
-- Strong encryption by default (based on [libsodium](https://doc.libsodium.org/))
+- strong encryption by default (based on [libsodium](https://doc.libsodium.org/))
 
-- Rate throttling
+- rate throttling
 
-- Easy to use api
+- easy to use api
 
 ## Getting Started & Tutorial
 
@@ -33,7 +33,7 @@ Here we'll implement some simple protocols, in just a few lines
    }
    ```
    
-   Now, we can read messages from client and send response back it. Here, we'll use the predefined `GeneralPayloadMessage` class to carry payload.
+   Now, we can read messages from client and send response back to it. Here, we'll use the predefined `GeneralPayloadMessage` class to carry payload.
    
    ```java
    public class EchoMessageHandler extends MessageHandler {
@@ -61,9 +61,9 @@ Here we'll implement some simple protocols, in just a few lines
    
    Congrats! Server now knows how to echo back to client. But how do we bring up the server?
 
-2. Setting up the server
+2. Running the server
    
-   We'll use `HttpSecServerBuilder` class the build a server.
+   We can use the `HttpSecServerBuilder` class the build and run a server.
    
    ```java
    public class ServerMain {
