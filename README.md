@@ -389,7 +389,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
    ```
 
-4. Writing handler class so that the knows how to handle calculation requests
+4. Writing handler class so that the server knows how to handle calculation requests
    
    ```java
    package us.leaf3stones.snm.demo.arithmetic;
@@ -500,6 +500,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
    Example output
    
+   > ```
    > 252 plus 9068 is 9320
    > 6164 minus 1487 is 4677
    > 4516 plus 6494 is 11010
@@ -511,7 +512,8 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    > 713 modulo 2096 is 713
    > 3528 minus 1161 is 2367
    > done
+   > ```
 
 7. Rate limiting
    
-   Coming soon. Read the classes inside `rate` class to learn more.
+   Coming soon. Read the classes inside `rate` package to learn more.
