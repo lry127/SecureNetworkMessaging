@@ -118,7 +118,7 @@ Here we'll implement some simple protocols, in just a few lines
    
    After a successful build, follow instruction in `src/main/java/us/leaf3stones/snm/crypto/CustomNativeLibInit.java` and modify that file.
    
-   The client will print `response: hi, SecureNetworkMessaging!` in the console and exit if everything is up. You can find the source code in `src/main/java/us/leaf3stones/snm/demo`
+   The client will print `response: hi, SecureNetworkMessaging!` in the console and exit if everything is up. You can find the source code in `src/main/java/us/leaf3stones/snm/demo/echo`
 
 5. Congrats! 
    
