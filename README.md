@@ -28,7 +28,7 @@ Here we'll implement some simple protocols, in just a few lines
    
        @Override
        public void takeOver() throws Exception {
-           
+   
        }
    }
    ```
@@ -56,7 +56,6 @@ Here we'll implement some simple protocols, in just a few lines
            peer.shutdown();
        }
    }
-   
    ```
    
    Congrats! Server now knows how to echo back to client. But how do we bring up the server?
@@ -81,7 +80,6 @@ Here we'll implement some simple protocols, in just a few lines
            server.accept(true); // 4
        }
    }
-   
    ```
    
    - // 1
@@ -100,22 +98,21 @@ Here we'll implement some simple protocols, in just a few lines
      
      block the current thread and run the server
 
-3.  Creating a Client
+3. Creating a Client
    
    ```java
    public class ClientMain {
-       public static void main(String[] args) throws Exception{
-           HttpSecClient client = new HttpSecClient("localhost", 5000, new BaseMessageDecoder());
-           GeneralPayloadMessage echoRequest = GeneralPayloadMessage.newInstance("echo", "hi, SecureNetworkMessaging!");
-           client.sendMessage(echoRequest);
-           GeneralPayloadMessage echoResponse = (GeneralPayloadMessage) client.readMessage();
-           System.err.println("response: " + echoResponse.getPayloadAsString());
-       }
+      public static void main(String[] args) throws Exception{
+          HttpSecClient client = new HttpSecClient("localhost", 5000, new BaseMessageDecoder());
+          GeneralPayloadMessage echoRequest = GeneralPayloadMessage.newInstance("echo", "hi, SecureNetworkMessaging!");
+          client.sendMessage(echoRequest);
+          GeneralPayloadMessage echoResponse = (GeneralPayloadMessage) client.readMessage();
+          System.err.println("response: " + echoResponse.getPayloadAsString());
+      }
    }
-   
    ```
 
-4.  Run the server first and then run the client.
+4. Run the server first and then run the client.
    
    the client will print `response: hi, SecureNetworkMessaging!` in the console and exit.
 
