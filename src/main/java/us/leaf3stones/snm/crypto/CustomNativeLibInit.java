@@ -5,7 +5,7 @@ package us.leaf3stones.snm.crypto;
  * the class name and {@link #init()} method should not be changed <br>
  * <strong>If you're going to modify it, run the following command
  * at the root project directory to prevent the submission to git</strong><br>
- * <code>git update-index --assume-unchanged src/main/java/us/leaf3stones/httpsec/crypto/CustomNativeLibInit.java</code>
+ * <code>git update-index --assume-unchanged src/main/java/us/leaf3stones/snm/crypto/CustomNativeLibInit.java</code>
  */
 public class CustomNativeLibInit {
     public static void init() {

@@ -1,4 +1,4 @@
-package us.leaf3stones.snm.demo;
+package us.leaf3stones.snm.demo.echo;
 
 import us.leaf3stones.snm.client.HttpSecClient;
 import us.leaf3stones.snm.message.BaseMessageDecoder;

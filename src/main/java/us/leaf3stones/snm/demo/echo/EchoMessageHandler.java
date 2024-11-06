@@ -1,4 +1,4 @@
-package us.leaf3stones.snm.demo;
+package us.leaf3stones.snm.demo.echo;
 
 import us.leaf3stones.snm.common.HttpSecPeer;
 import us.leaf3stones.snm.handler.MessageHandler;
