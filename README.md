@@ -114,7 +114,11 @@ Here we'll implement some simple protocols, in just a few lines
 
 4. Run the server first and then run the client.
    
-   the client will print `response: hi, SecureNetworkMessaging!` in the console and exit.
+   You'll need to build the jni crypto library project first to run the java program. For more information, check out the [jni project](https://github.com/lry127/secure_network_messaging_crypto_lib).
+   
+   After a successful build, follow instruction in `src/main/java/us/leaf3stones/snm/crypto/CustomNativeLibInit.java` and modify that file.
+   
+   The client will print `response: hi, SecureNetworkMessaging!` in the console and exit if everything is up. You can find the source code in `src/main/java/us/leaf3stones/snm/demo`
 
 5. Congrats! 
    
