@@ -126,7 +126,7 @@ Here we'll implement some simple protocols, in just a few lines
 
 #### Example #2: Remote Calculator
 
-In this tutorial, we'll implement a remote calculator using SecureNetworkMessaging library. You'll learn...
+In this tutorial, we'll implement a remote calculator using SecureNetworkMessaging library (source code located at `src/main/java/us/leaf3stones/snm/demo/arithmetic`). You'll learn...
 
 - How to define your own messages
 
