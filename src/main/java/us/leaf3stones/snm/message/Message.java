@@ -46,7 +46,7 @@ public abstract class Message {
         return nativeBuffer;
     }
 
-    abstract int getTypeIdentifier();
+     protected abstract int getTypeIdentifier();
 
     protected abstract int peekDataSize();
 

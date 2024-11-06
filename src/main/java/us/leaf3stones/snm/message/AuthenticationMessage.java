@@ -22,7 +22,7 @@ public class AuthenticationMessage extends Message {
     }
 
     @Override
-    int getTypeIdentifier() {
+    public int getTypeIdentifier() {
         return BaseMessageDecoder.MessageTypeIdentifiers.TYPE_AUTHENTICATION_MESSAGE;
     }
 

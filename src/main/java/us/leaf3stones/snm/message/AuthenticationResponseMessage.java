@@ -27,7 +27,7 @@ public class AuthenticationResponseMessage extends Message {
     }
 
     @Override
-    int getTypeIdentifier() {
+    protected int getTypeIdentifier() {
         return BaseMessageDecoder.MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE;
     }
 

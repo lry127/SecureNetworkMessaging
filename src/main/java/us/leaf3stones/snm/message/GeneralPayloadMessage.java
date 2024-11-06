@@ -26,7 +26,7 @@ public class GeneralPayloadMessage extends Message {
     }
 
     @Override
-    int getTypeIdentifier() {
+    protected int getTypeIdentifier() {
         return BaseMessageDecoder.MessageTypeIdentifiers.TYPE_GENERAL_PAYLOAD_MESSAGE;
     }
 

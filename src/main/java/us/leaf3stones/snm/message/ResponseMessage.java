@@ -36,7 +36,7 @@ public class ResponseMessage extends Message {
     }
 
     @Override
-    int getTypeIdentifier() {
+    protected int getTypeIdentifier() {
         return BaseMessageDecoder.MessageTypeIdentifiers.TYPE_RESPONSE_MESSAGE;
     }
 
