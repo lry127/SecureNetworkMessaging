@@ -15,6 +15,6 @@ public class UnlimitedRateLimitingPolicy implements RateLimiting.RateLimitingPol
 
     @Override
     public int getWaitingTimeFor(int ip, RateLimiting.AccessLog accessLog) {
-        return -1;
+        return 0;
     }
 }
