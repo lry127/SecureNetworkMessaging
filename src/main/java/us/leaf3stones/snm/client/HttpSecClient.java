@@ -15,6 +15,5 @@ public class HttpSecClient extends HttpSecPeer {
         } catch (GeneralSecurityException e) {
             throw new IOException(e);
         }
-        new ProofOfWorkClient(this).authenticateToServer();
     }
 }
