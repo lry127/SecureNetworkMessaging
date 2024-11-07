@@ -49,8 +49,12 @@ public class HttpSecPeer {
         return messageFactory.parseMessage(peerIn);
     }
 
-    public void sendMessage(Message message) throws IOException {
-        peerOut.write(messageFactory.serializeMessage(message));
+    public void sendMessage(Message message) throws NetIOException {
+        try {
+            peerOut.write(messageFactory.serializeMessage(message));
+        } catch (IOException e) {
+            throw new NetIOException(e, true);
+        }
     }
 
     public void shutdown() {
