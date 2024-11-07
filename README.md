@@ -226,7 +226,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
        }
    
    }
-   
    ```
    
    ```java
@@ -260,7 +259,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            return Set.of(MessageTypeIdentifiers.TYPE_ARITHMETIC_MESSAGE);
        }
    }
-   
    ```
    
    notable features:
@@ -293,15 +291,15 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
    public class ArithmeticResponseMessage extends Message {
        private byte[] message;
-       
+   
        public ArithmeticResponseMessage(byte[] message) {
            this.message = message;
        }
-       
+   
        public ArithmeticResponseMessage(ByteBuffer buffer) {
            super(buffer);
        }
-       
+   
        @Override
        protected int getTypeIdentifier() {
            return ArithmeticMessageDecoder.MessageTypeIdentifiers.TYPE_ARITHMETIC_RESPONSE_MESSAGE;
@@ -321,16 +319,15 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
        protected void constructMessage(ByteBuffer buf) throws Exception {
            message = sizedRead(buf);
        }
-       
+   
        public String getMessage() {
            return new String(message, StandardCharsets.UTF_8);
        }
-       
+   
        public static ArithmeticResponseMessage newInstance(String response) {
            return new ArithmeticResponseMessage(response.getBytes(StandardCharsets.UTF_8));
        }
    }
-   
    ```
    
    notable features:
@@ -386,7 +383,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
                    MessageTypeIdentifiers.TYPE_ARITHMETIC_RESPONSE_MESSAGE);
        }
    }
-   
    ```
 
 4. Writing handler class so that the server knows how to handle calculation requests
@@ -416,7 +412,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            }
        }
    }
-   
    ```
 
 5. Bringing up server. (If you run into any error related to native library, please refer to tutorial 1 and learn how to build it)
@@ -424,31 +419,41 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    ```java
    package us.leaf3stones.snm.demo.arithmetic;
    
+   import org.slf4j.Logger;
+   import org.slf4j.LoggerFactory;
    import us.leaf3stones.snm.common.HttpSecPeer;
-   import us.leaf3stones.snm.handler.HandlerFactory;
    import us.leaf3stones.snm.handler.MessageHandler;
-   import us.leaf3stones.snm.message.BaseMessageDecoder;
-   import us.leaf3stones.snm.server.HttpSecServer;
-   import us.leaf3stones.snm.server.HttpSecServerBuilder;
+   import us.leaf3stones.snm.message.Message;
+   import us.leaf3stones.snm.message.NetIOException;
    
    import java.io.IOException;
    
-   public class ServerMain {
-       public static void main(String[] args) throws IOException {
-           HttpSecServerBuilder builder = new HttpSecServerBuilder();
-           builder.setPort(5000);
-           builder.setHandlerFactory(new HandlerFactory() {
-               @Override
-               public MessageHandler createRequestHandler(HttpSecPeer peer) {
-                   return new ArithmeticOperationHandler(peer);
+   public class ArithmeticOperationHandler extends MessageHandler {
+       private static final Logger logger = LoggerFactory.getLogger(ArithmeticOperationHandler.class);
+   
+       public ArithmeticOperationHandler(HttpSecPeer peer) {
+           super(peer);
+       }
+   
+       @Override
+       public void takeOver() throws Exception {
+           while (true) {
+               try {
+                   if (!(peer.readMessage() instanceof ArithmeticMessage arithmeticMsg)) {
+                       throw new RuntimeException("can only handle arithmetic message");
+                   }
+                   String executedCalculation = arithmeticMsg.execute();
+                   Message response = ArithmeticResponseMessage.newInstance(executedCalculation);
+                   peer.sendMessage(response);
+               } catch (NetIOException netIOException) {
+                   if (!netIOException.isAbnormalIOException) {
+                       logger.info("client closed the connection cleanly");
+                       break;
+                   } else {
+                       throw new IOException(netIOException);
+                   }
                }
-           });
-           // though we didn't use any predefined message, we can still include the
-           // base decoder for easier migration if we later changed our minds and use
-           // a predefined message
-           builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
-           HttpSecServer server = builder.build();
-           server.accept(true);
+           }
        }
    }
    
@@ -466,7 +471,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    import java.util.Random;
    
    public class ClientMain {
-       public static void main(String[] args) throws Exception{
+       public static void main(String[] args) throws Exception {
            HttpSecClient client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
            Random r = new Random();
            for (int i = 0; i < 10; ++i) {
@@ -492,10 +497,10 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
                ArithmeticResponseMessage response = (ArithmeticResponseMessage) client.readMessage();
                System.err.print(response.getMessage());
            }
+           client.shutdown();
            System.err.println("done");
        }
    }
-   
    ```
    
    Example output

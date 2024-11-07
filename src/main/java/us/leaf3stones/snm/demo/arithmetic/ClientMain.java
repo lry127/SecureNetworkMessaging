@@ -7,7 +7,7 @@ import us.leaf3stones.snm.message.Message;
 import java.util.Random;
 
 public class ClientMain {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         HttpSecClient client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
         Random r = new Random();
         for (int i = 0; i < 10; ++i) {
@@ -33,6 +33,7 @@ public class ClientMain {
             ArithmeticResponseMessage response = (ArithmeticResponseMessage) client.readMessage();
             System.err.print(response.getMessage());
         }
+        client.shutdown();
         System.err.println("done");
     }
 }
