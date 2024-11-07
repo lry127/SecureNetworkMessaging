@@ -12,6 +12,8 @@ A java library that helps you write your own secure network messaging system eff
 
 - easy to use api
 
+- [ ] messages with different priority
+
 ## Getting Started & Tutorial
 
 Here we'll implement some simple protocols, in just a few lines
@@ -130,7 +132,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
 
 - How to define your own messages
 
-- How to avoid flooding your server (rate limiting api)
+- How to prevent your server from abuse (rate limiting api)
 1. Defining arithmetic request message. This is the message client sends to server to request calculation
    
    ```java
@@ -521,4 +523,94 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
 
 7. Rate limiting
    
-   Coming soon. Read the classes inside `rate` package to learn more.
+   To set a limit on how fast any client *with the same IP* can access our service, we need to implement the `RateLimitingPolicy` interface
+   
+   ```java
+   public interface RateLimitingPolicy {
+       int getRefreshIntervalMillis();
+       void onRefresh(Map<Integer, AccessLog> accessMap, long currTime);
+       int getWaitingTimeFor(int ip, AccessLog accessLog);
+   }
+       
+   public static class AccessLog {
+       public List<Long> accesses = new ArrayList<>();
+   }
+   ```
+   
+   1. `getRefreshIntervalMillis()` determines the interval of calling `onRefresh()` by the framework
+   
+   2. `getWaitingTimeFor()`  is called whenever a client want to connect to the server, either return an integer (in milliseconds) so that the service will be delayed for that amount of time, or throw a `TooManyRequest` exception, resulting the framework close the connection immediately (by sending TCP RST to client)
+   
+   Here we'll implement a simple policy that there's no delay as long as the client don't access our server more than 3 times within 30 seconds. If the client tries to do so, the server will immediately close the connection.
+   
+   ```java
+   package us.leaf3stones.snm.demo.arithmetic;
+   
+   import us.leaf3stones.snm.rate.RateLimiting;
+   
+   import java.util.ArrayList;
+   import java.util.Map;
+   
+   public class CalculatorRateLimiting implements RateLimiting.RateLimitingPolicy {
+       private static final int REFRESH_INTERVAL_MILLIS = 10_000; // 10 sec
+       private static final int LOG_RESET_INTERVAL_MILLIS = 30_000; // 30 sec
+   
+       @Override
+       public int getRefreshIntervalMillis() {
+           return REFRESH_INTERVAL_MILLIS;
+       }
+   
+       @Override
+       public void onRefresh(Map<Integer, RateLimiting.AccessLog> accessMap, long currTime) {
+           long expireMin = currTime - LOG_RESET_INTERVAL_MILLIS;
+           ArrayList<Integer> expired = new ArrayList<>();
+           for (Map.Entry<Integer, RateLimiting.AccessLog> entry : accessMap.entrySet()) {
+               RateLimiting.AccessLog log = entry.getValue();
+               if (log.accesses.isEmpty()) {
+                   expired.add(entry.getKey());
+                   continue;
+               }
+               log.accesses.removeIf(accessedTime -> accessedTime < expireMin);
+           }
+           expired.forEach(accessMap::remove);
+       }
+   
+       @Override
+       public int getWaitingTimeFor(int ip, RateLimiting.AccessLog accessLog) {
+           if (accessLog.accesses.size() < 3)  {
+               accessLog.accesses.add(System.currentTimeMillis());
+               return 0;
+           }
+           throw new RateLimiting.TooManyRequestException("this ip requested more than 3 connections within 30 secs, " +
+                   "rejecting new connections");
+       }
+   }
+   
+   ```
+   
+   Set the policy in the server builder
+   
+   ```java
+   builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+   ```
+   
+   Now try to connect to the server. The first 3 accesses returns the results normally, but when trying to access it the forth time, exception will occur,  indicating our policy is working properly.
+   
+   > ```
+   > Exception in thread "main" java.net.SocketException: Connection reset by peer
+   > 	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+   > 	at java.base/sun.nio.ch.SocketDispatcher.write(SocketDispatcher.java:62)
+   > 	at java.base/sun.nio.ch.NioSocketImpl.tryWrite(NioSocketImpl.java:394)
+   > 	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:410)
+   > 	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
+   > 	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:819)
+   > 	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1195)
+   > 	at java.base/java.io.OutputStream.write(OutputStream.java:124)
+   > 	at us.leaf3stones.snm.crypto.CryptoNegotiation.negotiateAsClient(CryptoNegotiation.java:36)
+   > 	at us.leaf3stones.snm.common.HttpSecPeer.tryToNegotiateCryptoInfo(HttpSecPeer.java:43)
+   > 	at us.leaf3stones.snm.client.HttpSecClient.<init>(HttpSecClient.java:14)
+   > 	at us.leaf3stones.snm.demo.arithmetic.ClientMain.main(ClientMain.java:11)
+   > 
+   > ```
+
+        

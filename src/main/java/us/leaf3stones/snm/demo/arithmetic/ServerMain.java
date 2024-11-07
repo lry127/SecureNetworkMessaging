@@ -23,6 +23,7 @@ public class ServerMain {
         // base decoder for easier migration if we later changed our minds and use
         // a predefined message
         builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+        builder.setRateLimitingPolicy(new CalculatorRateLimiting());
         HttpSecServer server = builder.build();
         server.accept(true);
     }
