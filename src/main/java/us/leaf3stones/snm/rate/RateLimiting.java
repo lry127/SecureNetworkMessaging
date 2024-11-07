@@ -67,10 +67,12 @@ public class RateLimiting {
 
     public int getWaitingTimeFor(int ip) {
         globalMapAccessLock.lock();
-        AccessLog log = accessMap.computeIfAbsent(ip, k -> new AccessLog());
-        int waitTime = policy.getWaitingTimeFor(ip, log);
-        globalMapAccessLock.unlock();
-        return waitTime;
+        try {
+            AccessLog log = accessMap.computeIfAbsent(ip, k -> new AccessLog());
+            return policy.getWaitingTimeFor(ip, log);
+        } finally {
+            globalMapAccessLock.unlock();
+        }
     }
 
     public interface RateLimitingPolicy {
