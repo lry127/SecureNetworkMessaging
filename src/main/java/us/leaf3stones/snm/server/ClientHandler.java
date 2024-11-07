@@ -60,7 +60,7 @@ public class ClientHandler implements Runnable {
                 } catch (Exception ignored) {
 
                 }
-                logger.error("SPAM DETECTED: auth error from {} : error: {}", remoteHost, e.getMessage());
+                logger.error("SPAM DETECTED: from {} : error: {}", remoteHost, e.getMessage());
                 try {
                     // set tcp RST
                     client.getPeerSocket().setSoLinger(true, 0);

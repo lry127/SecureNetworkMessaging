@@ -5,6 +5,7 @@ import us.leaf3stones.snm.crypto.NegotiatedCryptoNative;
 import us.leaf3stones.snm.message.Message;
 import us.leaf3stones.snm.message.MessageDecoder;
 import us.leaf3stones.snm.message.MessageFactory;
+import us.leaf3stones.snm.message.NetIOException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +45,7 @@ public class HttpSecPeer {
         messageFactory = new MessageFactory(crypto, decoder);
     }
 
-    public Message readMessage() throws IOException {
+    public Message readMessage() throws NetIOException {
         return messageFactory.parseMessage(peerIn);
     }
 

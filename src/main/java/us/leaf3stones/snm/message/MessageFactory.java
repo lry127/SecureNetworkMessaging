@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import us.leaf3stones.snm.crypto.LengthMessageCrypto;
 import us.leaf3stones.snm.crypto.NegotiatedCryptoNative;
 
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 
@@ -22,12 +20,12 @@ public class MessageFactory {
         this.decoder = decoder;
     }
 
-    public Message parseMessage(InputStream in) throws IOException {
+    public Message parseMessage(InputStream in) throws NetIOException {
         LengthMessageCrypto lengthMessage = null;
         try {
-            byte[] encLengthMsg = in.readNBytes(LengthMessageCrypto.getHeaderLength());
+            byte[] encLengthMsg = InputStreamUtil.readNBytes(in, LengthMessageCrypto.getHeaderLength());
             if (encLengthMsg.length != LengthMessageCrypto.getHeaderLength()) {
-                throw new EOFException("failed to read: " + encLengthMsg.length + " bytes");
+                throw new NetIOException("failed to read: " + encLengthMsg.length + " bytes", false);
             }
             lengthMessage = crypto.createNewLengthMessageForDecryption(encLengthMsg);
             if (lengthMessage == null) {
@@ -37,9 +35,9 @@ public class MessageFactory {
             if (encryptedBodySize > MAX_ACCEPTABLE_MESSAGE_LENGTH || encryptedBodySize <= 0) {
                 throw new GeneralSecurityException("peer sent a message with unacceptable payload. payload len: " + encryptedBodySize);
             }
-            byte[] bodyEncrypted = in.readNBytes((int) encryptedBodySize);
+            byte[] bodyEncrypted = InputStreamUtil.readNBytes(in, (int) encryptedBodySize);
             if (bodyEncrypted.length != encryptedBodySize) {
-                throw new EOFException("failed to read: " + encryptedBodySize + " bytes");
+                throw new NetIOException("failed to read: " + encryptedBodySize + " bytes", false);
             }
             byte[] bodyDecrypted = lengthMessage.decrypt(bodyEncrypted);
             if (bodyDecrypted == null) {
@@ -48,7 +46,7 @@ public class MessageFactory {
             return decoder.decode(bodyDecrypted);
         } catch (GeneralSecurityException securityException) {
             logger.warn("failed to decrypt message");
-            throw new IOException(securityException);
+            throw new NetIOException(securityException, true);
         } finally {
             if (lengthMessage != null) {
                 lengthMessage.clean();

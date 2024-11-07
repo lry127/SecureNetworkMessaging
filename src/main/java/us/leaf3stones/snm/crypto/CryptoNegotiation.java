@@ -1,13 +1,15 @@
 package us.leaf3stones.snm.crypto;
 
+import us.leaf3stones.snm.message.InputStreamUtil;
+import us.leaf3stones.snm.message.NetIOException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 
 /**
- * a special type of message that communication entities send at the beginning
- * to establish a secure connection for subsequent messages
+ * helper class to help communication entities establish a secure connection for subsequent messages
  */
 public class CryptoNegotiation {
     private static boolean isKeyCacheEnabled = true;
@@ -35,7 +37,7 @@ public class CryptoNegotiation {
         return clientCrypto;
     }
 
-    public static NegotiatedCryptoNative negotiateAsServer(InputStream in, @SuppressWarnings("unused") OutputStream out, String serverPublicKey, String serverPrivateKey) throws IOException, GeneralSecurityException {
+    public static NegotiatedCryptoNative negotiateAsServer(InputStream in, @SuppressWarnings("unused") OutputStream out, String serverPublicKey, String serverPrivateKey) throws NetIOException, GeneralSecurityException {
         byte[] serverPublicKeyBytes;
         byte[] serverPrivateKeyBytes;
         if (isKeyCacheEnabled) {
@@ -52,7 +54,7 @@ public class CryptoNegotiation {
             serverPrivateKeyBytes = NegotiatedCryptoNative.decodeKey(serverPrivateKey, "server private key");
         }
 
-        byte[] clientPublicKeyBytes = in.readNBytes(NegotiatedCryptoNative.KEY_EXCHANGE_KEY_SIZE);
+        byte[] clientPublicKeyBytes = InputStreamUtil.readNBytes(in, NegotiatedCryptoNative.KEY_EXCHANGE_KEY_SIZE);
         return new NegotiatedCryptoNative(serverPublicKeyBytes, serverPrivateKeyBytes, clientPublicKeyBytes, true);
     }
 
