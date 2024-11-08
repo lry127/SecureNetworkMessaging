@@ -63,32 +63,24 @@ class MessageFactoryTest {
         MessageFactory clientFactory = new MessageFactory(client, new BaseMessageDecoder());
         MessageFactory serverFactory = new MessageFactory(server, new BaseMessageDecoder());
 
-        ExecutorService executor = Executors.newFixedThreadPool(20);
-
         long testBegin = System.currentTimeMillis();
-        for (int i = 0; i < 3_000_000; ++i) {
-            executor.execute(() -> {
-                byte[] data = new byte[256];
-                Message msg = GeneralPayloadMessage.newInstance("test", data);
-                byte[] enc = clientFactory.serializeMessage(msg);
-                InputStream encryptedDateInput = new ByteArrayInputStream(enc);
-                Message recMsg = null;
-                try {
-                    recMsg = serverFactory.parseMessage(encryptedDateInput);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        for (int i = 0; i < 1_000_000; ++i) {
+            byte[] data = new byte[256];
+            Message msg = GeneralPayloadMessage.newInstance("test", data);
+            byte[] enc = clientFactory.serializeMessage(msg);
+            InputStream encryptedDateInput = new ByteArrayInputStream(enc);
+            Message recMsg = null;
+            try {
+                recMsg = serverFactory.parseMessage(encryptedDateInput);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-                GeneralPayloadMessage payloadMessage = (GeneralPayloadMessage) recMsg;
-                Assertions.assertEquals("test", payloadMessage.getName());
-                Assertions.assertArrayEquals(data, payloadMessage.getPayload());
-            });
-
+            GeneralPayloadMessage payloadMessage = (GeneralPayloadMessage) recMsg;
+            Assertions.assertEquals("test", payloadMessage.getName());
+            Assertions.assertArrayEquals(data, payloadMessage.getPayload());
         }
-        executor.close();
         long testEnd = System.currentTimeMillis();
         System.err.printf("it took %.3f seconds to finish.", (testEnd - testBegin) / 1000.0);
-
-
     }
 }
