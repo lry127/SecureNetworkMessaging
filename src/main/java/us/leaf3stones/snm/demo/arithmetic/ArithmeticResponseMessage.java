@@ -16,6 +16,10 @@ public class ArithmeticResponseMessage extends Message {
         super(buffer);
     }
 
+    public static ArithmeticResponseMessage newInstance(String response) {
+        return new ArithmeticResponseMessage(response.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     protected int getTypeIdentifier() {
         return ArithmeticMessageDecoder.MessageTypeIdentifiers.TYPE_ARITHMETIC_RESPONSE_MESSAGE;
@@ -38,9 +42,5 @@ public class ArithmeticResponseMessage extends Message {
 
     public String getMessage() {
         return new String(message, StandardCharsets.UTF_8);
-    }
-
-    public static ArithmeticResponseMessage newInstance(String response) {
-        return new ArithmeticResponseMessage(response.getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -65,7 +65,7 @@ public class HttpSecServer {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     logger.info("accept client from {}", clientSocket.getRemoteSocketAddress().toString().replace('/', ' '));
-                    executor.execute(new ClientHandler(clientSocket, handlerFactory, authChain, decoder));
+                    executor.execute(new ClientHandler(clientSocket, executor, handlerFactory, authChain, decoder));
                 } catch (Exception e) {
                     logger.warn("failed to accept {}", e.getMessage());
                 }

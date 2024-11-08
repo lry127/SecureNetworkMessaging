@@ -31,7 +31,7 @@ public class CalculatorRateLimiting implements RateLimiting.RateLimitingPolicy {
 
     @Override
     public int getWaitingTimeFor(int ip, RateLimiting.AccessLog accessLog) {
-        if (accessLog.accesses.size() < 3)  {
+        if (accessLog.accesses.size() < 3) {
             accessLog.accesses.add(System.currentTimeMillis());
             return 0;
         }

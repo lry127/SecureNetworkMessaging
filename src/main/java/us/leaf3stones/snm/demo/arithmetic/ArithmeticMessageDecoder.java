@@ -7,11 +7,6 @@ import java.nio.ByteBuffer;
 import java.util.Set;
 
 public class ArithmeticMessageDecoder extends MessageDecoder {
-    public static class MessageTypeIdentifiers {
-        public static int TYPE_ARITHMETIC_MESSAGE = 1000;
-        public static int TYPE_ARITHMETIC_RESPONSE_MESSAGE = 1001;
-    }
-
     public ArithmeticMessageDecoder(MessageDecoder parent) {
         super(parent);
     }
@@ -30,5 +25,10 @@ public class ArithmeticMessageDecoder extends MessageDecoder {
     protected Set<Integer> getConvertableMessageIds() {
         return Set.of(MessageTypeIdentifiers.TYPE_ARITHMETIC_MESSAGE,
                 MessageTypeIdentifiers.TYPE_ARITHMETIC_RESPONSE_MESSAGE);
+    }
+
+    public static class MessageTypeIdentifiers {
+        public static int TYPE_ARITHMETIC_MESSAGE = 1000;
+        public static int TYPE_ARITHMETIC_RESPONSE_MESSAGE = 1001;
     }
 }

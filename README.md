@@ -12,7 +12,7 @@ A java library that helps you write your own secure network messaging system eff
 
 - [x] easy to use api
 
-- [ ] messages with different priority
+- [x] messages with different priority
 
 ## Getting Started & Tutorial
 
@@ -429,7 +429,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            }
        }
    }
-   
    ```
 
 5. Bringing up server. (If you run into any error related to native library, please refer to tutorial 1 and learn how to build it)
@@ -465,7 +464,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            server.accept(true);
        }
    }
-   
    ```
 
 6. Run the client

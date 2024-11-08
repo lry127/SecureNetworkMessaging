@@ -13,6 +13,7 @@ import us.leaf3stones.snm.rate.RateLimiting;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 
 public class ClientHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
@@ -21,8 +22,8 @@ public class ClientHandler implements Runnable {
     private final HandlerFactory handlerFactory;
     private final AuthenticationChain authChain;
 
-    public ClientHandler(Socket client, HandlerFactory handlerFactory, AuthenticationChain authChain, MessageDecoder decoder) throws IOException {
-        this.client = new HttpSecPeer(client, decoder);
+    public ClientHandler(Socket client, ExecutorService executor, HandlerFactory handlerFactory, AuthenticationChain authChain, MessageDecoder decoder) throws IOException {
+        this.client = new HttpSecPeer(client, decoder, executor);
         this.handlerFactory = handlerFactory;
         this.authChain = authChain;
     }

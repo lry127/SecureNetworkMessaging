@@ -5,16 +5,9 @@ import us.leaf3stones.snm.message.Message;
 import java.nio.ByteBuffer;
 
 public class ArithmeticMessage extends Message {
-    public static class Operator {
-        public static final byte ADD = 1;
-        public static final byte MINUS = 2;
-        public static final byte MOD = 3;
-    }
-
     private byte operator;
     private long operand1;
     private long operand2;
-
     public ArithmeticMessage(byte operator, long operand1, long operand2) {
         this.operator = operator;
         this.operand1 = operand1;
@@ -23,6 +16,18 @@ public class ArithmeticMessage extends Message {
 
     public ArithmeticMessage(ByteBuffer buffer) {
         super(buffer);
+    }
+
+    public static ArithmeticMessage additionMessage(long operand1, long operand2) {
+        return new ArithmeticMessage(Operator.ADD, operand1, operand2);
+    }
+
+    public static ArithmeticMessage subtractionMessage(long operand1, long operand2) {
+        return new ArithmeticMessage(Operator.MINUS, operand1, operand2);
+    }
+
+    public static ArithmeticMessage moduloMessage(long operand1, long operand2) {
+        return new ArithmeticMessage(Operator.MOD, operand1, operand2);
     }
 
     @Override
@@ -72,21 +77,15 @@ public class ArithmeticMessage extends Message {
                 operatorString = "modulo";
                 break;
             default:
-            throw new RuntimeException("undefined operator: " + operator);
+                throw new RuntimeException("undefined operator: " + operator);
         }
         return String.format("%d %s %d is %d\n", operand1, operatorString, operand2, result);
     }
 
-    public static ArithmeticMessage additionMessage(long operand1, long operand2) {
-        return new ArithmeticMessage(Operator.ADD, operand1, operand2);
-    }
-
-    public static ArithmeticMessage subtractionMessage(long operand1, long operand2) {
-        return new ArithmeticMessage(Operator.MINUS, operand1, operand2);
-    }
-
-    public static ArithmeticMessage moduloMessage(long operand1, long operand2) {
-        return new ArithmeticMessage(Operator.MOD, operand1, operand2);
+    public static class Operator {
+        public static final byte ADD = 1;
+        public static final byte MINUS = 2;
+        public static final byte MOD = 3;
     }
 
 }
