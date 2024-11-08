@@ -4,13 +4,13 @@ A java library that helps you write your own secure network messaging system eff
 
 ## Features
 
-- custom messages
+- [x] custom messages
 
-- strong encryption by default (based on [libsodium](https://doc.libsodium.org/))
+- [x] strong encryption by default (based on [libsodium](https://doc.libsodium.org/))
 
-- rate throttling
+- [x] rate throttling
 
-- easy to use api
+- [x] easy to use api
 
 - [ ] messages with different priority
 
