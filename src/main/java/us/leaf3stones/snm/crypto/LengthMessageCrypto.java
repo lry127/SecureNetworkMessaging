@@ -19,7 +19,7 @@ public class LengthMessageCrypto {
     }
 
     public static int getHeaderLength() {
-        return CRYPTO_NONCE_BYTES + CRYPTO_MAC_BYTES + Long.BYTES;
+        return CRYPTO_NONCE_BYTES + CRYPTO_MAC_BYTES + Integer.BYTES;
     }
 
     public static int getFullEncryptionOverhead() {
@@ -32,7 +32,7 @@ public class LengthMessageCrypto {
 
     private native byte[] decryptNative(byte[] data);
 
-    public native long getEncryptedBodySize();
+    public native int getEncryptedBodySize();
 
     public byte[] encrypt(NativeBuffer buffer) throws GeneralSecurityException {
         if (purpose != Purpose.ENCRYPTION) {
