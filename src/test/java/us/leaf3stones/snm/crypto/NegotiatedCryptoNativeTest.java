@@ -101,6 +101,30 @@ class NegotiatedCryptoNativeTest {
     }
 
     @Test
+    void extremelyLengthyCommunicationThatResultsInMessageIdFlip() throws Exception {
+        if (true) {
+            // disabled by default.
+            return;
+        }
+        final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
+        final String serverKeyExchangePrivateKey = "NMQrEmJXxf+0rQMgsux27cjP6vmW678ArBgQkAS8ytU=";
+
+        final byte[] serverPubBytes = NegotiatedCryptoNative.decodeKey(serverKeyExchangePublicKey, "server public key");
+        final byte[] serverPriBytes = NegotiatedCryptoNative.decodeKey(serverKeyExchangePrivateKey, "server private key");
+
+        NegotiatedCryptoNative client = new NegotiatedCryptoNative(serverKeyExchangePublicKey);
+        NegotiatedCryptoNative server = new NegotiatedCryptoNative(serverPubBytes, serverPriBytes, client.getMyKeyExchangePublicKey(), true);
+        assertArrayEquals(client.getMyKeyExchangePublicKey(), server.getPeerKeyExchangePublicKey());
+        assertArrayEquals(server.getMyKeyExchangePublicKey(), client.getPeerKeyExchangePublicKey());
+
+        byte[] message = new byte[16];
+        for (long i = 0; i < Integer.MAX_VALUE * 3L; ++i) {
+            encryptionAndDecryptionTestMutual(message, client, server);
+        }
+    }
+
+
+    @Test
     void concurrentAccessTest_Part1_MultiplyCommunicationPairs() {
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         for (int i = 0; i < 100_000; ++i) {
@@ -152,45 +176,13 @@ class NegotiatedCryptoNativeTest {
     }
 
     @Test
-    void concurrentAccessTest_Part2_OneCommunicationPairWithParallelMessages() throws Exception {
-        final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
-        final String serverKeyExchangePrivateKey = "NMQrEmJXxf+0rQMgsux27cjP6vmW678ArBgQkAS8ytU=";
-
-        final byte[] serverPubBytes = NegotiatedCryptoNative.decodeKey(serverKeyExchangePublicKey, "server public key");
-        final byte[] serverPriBytes = NegotiatedCryptoNative.decodeKey(serverKeyExchangePrivateKey, "server private key");
-
-        NegotiatedCryptoNative client = new NegotiatedCryptoNative(serverKeyExchangePublicKey);
-        NegotiatedCryptoNative server = new NegotiatedCryptoNative(serverPubBytes, serverPriBytes, client.getMyKeyExchangePublicKey(), true);
-
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        for (int i = 0; i < 1_000; ++i) {
-            Random r = new Random();
-            executor.execute(() -> {
-                byte[] message = new byte[16];
-                r.nextBytes(message);
-                try {
-                    encryptionAndDecryptionTestMutual(message, client, server);
-                } catch (GeneralSecurityException e) {
-                    fail(e);
-                }
-            });
-        }
-        executor.close();
-
-
-        assertEquals(0, LengthMessageCrypto.getTotalInstanceCount());
-        assertEquals(0, NegotiatedCryptoNative.getTotalInstanceCount());
-    }
-
-    @Test
-    void concurrentAccessTest_Part3_ParallelCommunicationPairsWithParallelMessages() {
+    void concurrentAccessTest_Part2_ParallelCommunicationPairs() {
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         for (int i = 0; i < 100_000; ++i) {
             Random r = new Random();
             int idx = i;
             executor.execute(() -> {
                 try {
-                    ExecutorService innerExecutor = Executors.newVirtualThreadPerTaskExecutor();
                     if (idx % 10 != 0) {
                         final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
                         final String serverKeyExchangePrivateKey = "NMQrEmJXxf+0rQMgsux27cjP6vmW678ArBgQkAS8ytU=";
@@ -201,19 +193,13 @@ class NegotiatedCryptoNativeTest {
                         NegotiatedCryptoNative client = new NegotiatedCryptoNative(serverKeyExchangePublicKey);
                         NegotiatedCryptoNative server = new NegotiatedCryptoNative(serverPubBytes, serverPriBytes, client.getMyKeyExchangePublicKey(), true);
 
-                        for (int j = 0; j < 10; ++j) {
-                            innerExecutor.execute(() -> {
-                                byte[] message = new byte[16];
-                                r.nextBytes(message);
-                                try {
-                                    encryptionAndDecryptionTestMutual(message, client, server);
-                                } catch (GeneralSecurityException e) {
-                                    fail(e);
-                                }
-                            });
+                        byte[] message = new byte[16];
+                        r.nextBytes(message);
+                        try {
+                            encryptionAndDecryptionTestMutual(message, client, server);
+                        } catch (GeneralSecurityException e) {
+                            fail(e);
                         }
-                        innerExecutor.close();
-
 
                     } else {
                         final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
@@ -226,7 +212,7 @@ class NegotiatedCryptoNativeTest {
                         NegotiatedCryptoNative server = new NegotiatedCryptoNative(serverPubBytes, serverPriBytes, client.getMyKeyExchangePublicKey(), true);
 
                         for (int j = 0; j < 10; ++j) {
-                            innerExecutor.execute(() -> {
+                            {
                                 byte[] message = new byte[16];
                                 r.nextBytes(message);
                                 assertThrows(GeneralSecurityException.class, () -> {
@@ -235,11 +221,8 @@ class NegotiatedCryptoNativeTest {
                                 assertThrows(GeneralSecurityException.class, () -> {
                                     encryptionAndDecryptionTest(message, server, client);
                                 });
-                            });
+                            }
                         }
-
-                        innerExecutor.close();
-
 
                     }
                 } catch (Exception e) {
@@ -262,7 +245,6 @@ class NegotiatedCryptoNativeTest {
             int idx = i;
             executor.execute(() -> {
                 try {
-                    ExecutorService innerExecutor = Executors.newVirtualThreadPerTaskExecutor();
                     if (idx % 10 != 0) {
                         final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
                         final String serverKeyExchangePrivateKey = "NMQrEmJXxf+0rQMgsux27cjP6vmW678ArBgQkAS8ytU=";
@@ -275,18 +257,14 @@ class NegotiatedCryptoNativeTest {
 
 
                         for (int j = 0; j < 3; ++j) {
-                            innerExecutor.execute(() -> {
-                                byte[] message = new byte[16];
-                                r.nextBytes(message);
-                                try {
-                                    encryptionAndDecryptionTestMutual(message, client, server);
-                                } catch (GeneralSecurityException e) {
-                                    fail(e);
-                                }
-                            });
+                            byte[] message = new byte[16];
+                            r.nextBytes(message);
+                            try {
+                                encryptionAndDecryptionTestMutual(message, client, server);
+                            } catch (GeneralSecurityException e) {
+                                fail(e);
+                            }
                         }
-
-                        innerExecutor.close();
 
                     } else {
                         final String serverKeyExchangePublicKey = "oOXyVeq7p1ooKvLbbcGO+t2Y+D4qiSbGeCi0Ug7vDlg=";
@@ -299,19 +277,15 @@ class NegotiatedCryptoNativeTest {
                         NegotiatedCryptoNative server = new NegotiatedCryptoNative(serverPubBytes, serverPriBytes, client.getMyKeyExchangePublicKey(), true);
 
                         for (int j = 0; j < 3; ++j) {
-                            innerExecutor.execute(() -> {
-                                byte[] message = new byte[16];
-                                r.nextBytes(message);
-                                assertThrows(GeneralSecurityException.class, () -> {
-                                    encryptionAndDecryptionTest(message, client, server);
-                                });
-                                assertThrows(GeneralSecurityException.class, () -> {
-                                    encryptionAndDecryptionTest(message, server, client);
-                                });
+                            byte[] message = new byte[16];
+                            r.nextBytes(message);
+                            assertThrows(GeneralSecurityException.class, () -> {
+                                encryptionAndDecryptionTest(message, client, server);
+                            });
+                            assertThrows(GeneralSecurityException.class, () -> {
+                                encryptionAndDecryptionTest(message, server, client);
                             });
                         }
-
-                        innerExecutor.close();
                     }
                 } catch (Exception e) {
                     fail(e);

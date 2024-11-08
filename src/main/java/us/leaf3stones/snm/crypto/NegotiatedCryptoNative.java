@@ -18,6 +18,8 @@ public class NegotiatedCryptoNative {
     private final byte[] myKeyExchangePublicKey = new byte[KEY_EXCHANGE_KEY_SIZE];
     private final byte[] myKeyExchangePrivateKey = new byte[KEY_EXCHANGE_KEY_SIZE];
     private final byte[] peerKeyExchangePublicKey;
+    private int messageSenderSeq = 0;
+    private int messageReceiverSeq = 0;
 
 
     public NegotiatedCryptoNative(byte[] myPublicKey, byte[] myPrivateKey, byte[] peerPublicKey, boolean isServer) throws GeneralSecurityException {
@@ -95,7 +97,7 @@ public class NegotiatedCryptoNative {
 
     private native long createNewLengthMessageNativeForDecryption(byte[] header, byte[] receiveKey);
 
-    private native long createNewLengthMessageNativeForEncryption(byte[] transmitKey);
+    private native long createNewLengthMessageNativeForEncryption(byte[] transmitKey, int messageId);
 
     private native void cleanLengthMessageNative(long handle);
 
@@ -108,14 +110,22 @@ public class NegotiatedCryptoNative {
         if (lengthMessageNativeHandle == 0) {
             throw new GeneralSecurityException("unable to create new length message");
         }
-        return new LengthMessageCrypto(this, lengthMessageNativeHandle, LengthMessageCrypto.Purpose.DECRYPTION);
+        LengthMessageCrypto lengthMessage = new LengthMessageCrypto(this, lengthMessageNativeHandle, LengthMessageCrypto.Purpose.DECRYPTION);
+        int receivedMessageId = lengthMessage.getMessageId();
+        if (receivedMessageId != messageReceiverSeq) {
+            lengthMessage.clean();
+            throw new GeneralSecurityException("message id error. expected: " + messageReceiverSeq + " actual: " + receivedMessageId);
+        }
+        ++messageReceiverSeq;
+        return lengthMessage;
     }
 
     public LengthMessageCrypto createNewLengthMessageForEncryption() throws GeneralSecurityException {
-        long lengthMessageNativeHandle = createNewLengthMessageNativeForEncryption(transmitKey);
+        long lengthMessageNativeHandle = createNewLengthMessageNativeForEncryption(transmitKey, messageSenderSeq);
         if (lengthMessageNativeHandle == 0) {
             throw new GeneralSecurityException("unable to create new length message");
         }
+        ++messageSenderSeq;
         return new LengthMessageCrypto(this, lengthMessageNativeHandle, LengthMessageCrypto.Purpose.ENCRYPTION);
     }
 
