@@ -474,55 +474,103 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    import us.leaf3stones.snm.client.HttpSecClient;
    import us.leaf3stones.snm.message.BaseMessageDecoder;
    import us.leaf3stones.snm.message.Message;
+   import us.leaf3stones.snm.message.NetIOException;
    
-   import java.util.Random;
+   import java.util.Scanner;
    
    public class ClientMain {
+       private static HttpSecClient client;
+   
        public static void main(String[] args) throws Exception {
-           HttpSecClient client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
-           Random r = new Random();
-           for (int i = 0; i < 10; ++i) {
-               Message m;
-               int op = r.nextInt(0, 3);
-               long operand1 = r.nextLong(100, 10000);
-               long operand2 = r.nextLong(100, 10000);
-               //noinspection EnhancedSwitchMigration
-               switch (op) {
-                   case 0:
-                       m = ArithmeticMessage.additionMessage(operand1, operand2);
-                       break;
-                   case 1:
-                       m = ArithmeticMessage.subtractionMessage(operand1, operand2);
-                       break;
-                   case 2:
-                       m = ArithmeticMessage.moduloMessage(operand1, operand2);
-                       break;
-                   default:
-                       throw new AssertionError("impossible");
+           client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+           client.enableKeepAlive(10_000);
+           try (Scanner scanner = new Scanner(System.in)) {
+               while (scanner.hasNextLine()) {
+                   processLine(scanner.nextLine());
                }
-               client.sendMessage(m);
-               ArithmeticResponseMessage response = (ArithmeticResponseMessage) client.readMessage();
-               System.err.print(response.getMessage());
+           } finally {
+               client.shutdown();
            }
-           client.shutdown();
            System.err.println("done");
+       }
+   
+       private static void processLine(String line) throws NetIOException {
+           char operator;
+           long operand1;
+           long operand2;
+           int idx;
+           if ((idx = line.indexOf("+")) != -1) {
+               operator = '+';
+           } else if ((idx = line.indexOf("-")) != -1) {
+               operator = '-';
+           } else if ((idx = line.indexOf("%")) != -1) {
+               operator = '%';
+           } else {
+               System.err.println("ill-formated expression. type expression in format like a + b or a - b or a % b.");
+               return;
+           }
+           String operand1String;
+           String operand2String;
+           try {
+               operand1String = line.substring(0, idx).trim();
+               operand2String = line.substring(idx + 1).trim();
+           } catch (Exception e) {
+               System.err.println("ill-formated expression. type expression in format like a + b or a - b or a % b.");
+               return;
+           }
+           try {
+               operand1 = Long.parseLong(operand1String);
+           } catch (NumberFormatException e) {
+               System.err.println("failed to parse operator 1 to a long: \"" + operand1String + "\"");
+               return;
+           }
+           try {
+               operand2 = Long.parseLong(operand2String);
+           } catch (NumberFormatException e) {
+               System.err.println("failed to parse operator 2 to a long: \"" + operand1String + "\"");
+               return;
+           }
+   
+           Message message = prepareMessage(operator, operand1, operand2);
+           client.sendMessage(message);
+           ArithmeticResponseMessage response = (ArithmeticResponseMessage) client.readMessage();
+           System.err.println(response.getMessage());
+       }
+   
+       private static Message prepareMessage(char operator, long operand1, long operand2) {
+           //noinspection EnhancedSwitchMigration
+           switch (operator) {
+               case '+':
+                   return ArithmeticMessage.additionMessage(operand1, operand2);
+               case '-':
+                   return ArithmeticMessage.subtractionMessage(operand1, operand2);
+               case '%':
+                   return ArithmeticMessage.moduloMessage(operand1, operand2);
+               default:
+                   throw new AssertionError("can't go here");
+           }
        }
    }
    ```
    
-   Example output
+   We call the `enableKeepAlive` function so that the client will send a dummy message to server every 10 seconds. This is useful to make sure the TCP connection is not closed by the server due to inactivity.
+   
+   Example input and output
    
    > ```
-   > 252 plus 9068 is 9320
-   > 6164 minus 1487 is 4677
-   > 4516 plus 6494 is 11010
-   > 8232 plus 5018 is 13250
-   > 7085 minus 1495 is 5590
-   > 9417 plus 1687 is 11104
-   > 7153 plus 3206 is 10359
-   > 4707 modulo 2975 is 1732
-   > 713 modulo 2096 is 713
-   > 3528 minus 1161 is 2367
+   > 3490284 + 234723
+   > 3490284 plus 234723 is 3725007
+   > 
+   > 39248 - 23482
+   > 39248 minus 23482 is 15766
+   > 
+   > 32 - 3248
+   > 32 minus 3248 is -3216
+   > 
+   > 1004520 % 24399
+   > 1004520 modulo 24399 is 4161
+   > 
+   > ^D
    > done
    > ```
 
