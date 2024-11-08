@@ -1,6 +1,7 @@
 package us.leaf3stones.snm.demo.arithmetic;
 
 import us.leaf3stones.snm.client.HttpSecClient;
+import us.leaf3stones.snm.client.NonceAuthClient;
 import us.leaf3stones.snm.message.BaseMessageDecoder;
 import us.leaf3stones.snm.message.Message;
 import us.leaf3stones.snm.message.NetIOException;
@@ -12,6 +13,7 @@ public class ClientMain {
 
     public static void main(String[] args) throws Exception {
         client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+        new NonceAuthClient(client).authenticateToServer();
         client.enableKeepAlive(10_000);
         try (Scanner scanner = new Scanner(System.in)) {
             while (scanner.hasNextLine()) {

@@ -471,6 +471,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    package us.leaf3stones.snm.demo.arithmetic;
    
    import us.leaf3stones.snm.client.HttpSecClient;
+   import us.leaf3stones.snm.client.NonceAuthClient;
    import us.leaf3stones.snm.message.BaseMessageDecoder;
    import us.leaf3stones.snm.message.Message;
    import us.leaf3stones.snm.message.NetIOException;
@@ -482,6 +483,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
        public static void main(String[] args) throws Exception {
            client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+           new NonceAuthClient(client).authenticateToServer();
            client.enableKeepAlive(10_000);
            try (Scanner scanner = new Scanner(System.in)) {
                while (scanner.hasNextLine()) {
@@ -550,6 +552,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            }
        }
    }
+   
    ```
    
    We call the `enableKeepAlive` function so that the client will send a dummy message to server every 10 seconds. This is useful to make sure the TCP connection is not closed by the server due to inactivity.

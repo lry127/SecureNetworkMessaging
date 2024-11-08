@@ -1,5 +1,7 @@
 package us.leaf3stones.snm.demo.arithmetic;
 
+import us.leaf3stones.snm.auth.AuthenticationChain;
+import us.leaf3stones.snm.auth.NonceAuthenticator;
 import us.leaf3stones.snm.common.HttpSecPeer;
 import us.leaf3stones.snm.handler.HandlerFactory;
 import us.leaf3stones.snm.handler.MessageHandler;
@@ -7,10 +9,9 @@ import us.leaf3stones.snm.message.BaseMessageDecoder;
 import us.leaf3stones.snm.server.HttpSecServer;
 import us.leaf3stones.snm.server.HttpSecServerBuilder;
 
-import java.io.IOException;
 
 public class ServerMain {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         HttpSecServerBuilder builder = new HttpSecServerBuilder();
         builder.setPort(5000);
         builder.setHandlerFactory(new HandlerFactory() {
@@ -24,6 +25,7 @@ public class ServerMain {
         // a predefined message
         builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
         builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+        builder.setAuthChain(new AuthenticationChain(NonceAuthenticator.class));
         HttpSecServer server = builder.build();
         server.accept(true);
     }
