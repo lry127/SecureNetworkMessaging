@@ -284,9 +284,9 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
    - you must have a `MessageDecoder` that recognize this type of message. 
 
-2. Defining arithmetic response message. This is message in response to `ArithmeticMessage` at the server side.
+2. Defining arithmetic response message. This is message sent in response to `ArithmeticMessage` at the server side.
    
-   Note that you can return a `GeneralResponseMessage` containing the result, but I'll define a new type of message here to show you how to send messages with *variable length*.
+   Note that while it's possible to return a `GeneralResponseMessage` containing the result,  I'll instead define a new type of message here to show you how to send messages with *variable length*.
    
    To demonstrate this, we return a text message directly to client in readable form. (so that the length is not fixed)
    
