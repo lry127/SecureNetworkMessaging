@@ -460,7 +460,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            server.accept(true);
        }
    }
-   
    ```
 
 6. Run the client
@@ -550,7 +549,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            }
        }
    }
-   
    ```
    
    We call the `enableKeepAlive` function so that the client will send a dummy message to server every 10 seconds. This is useful to make sure the TCP connection is not closed by the server due to inactivity.
