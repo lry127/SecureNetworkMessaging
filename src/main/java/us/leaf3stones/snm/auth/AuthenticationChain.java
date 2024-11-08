@@ -1,7 +1,6 @@
 package us.leaf3stones.snm.auth;
 
 import us.leaf3stones.snm.common.HttpSecPeer;
-import us.leaf3stones.snm.server.HttpSecServer;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -15,7 +14,7 @@ public class AuthenticationChain {
     public AuthenticationChain(Class<? extends Authenticator>... authenticators) throws NoSuchMethodException {
         activatedAuthenticators = new ArrayList<>();
         for (Class<? extends Authenticator> authClass : authenticators) {
-            activatedAuthenticators.add(authClass.getConstructor(HttpSecServer.class));
+            activatedAuthenticators.add(authClass.getConstructor(HttpSecPeer.class));
         }
     }
 
