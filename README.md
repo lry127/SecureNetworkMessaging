@@ -441,6 +441,18 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
 5. Bringing up server. (If you run into any error related to native library, please refer to tutorial 1 and learn how to build it)
    
    ```java
+   package us.leaf3stones.snm.demo.arithmetic;
+   
+   import us.leaf3stones.snm.auth.AuthenticationChain;
+   import us.leaf3stones.snm.auth.NonceAuthenticator;
+   import us.leaf3stones.snm.common.HttpSecPeer;
+   import us.leaf3stones.snm.handler.HandlerFactory;
+   import us.leaf3stones.snm.handler.MessageHandler;
+   import us.leaf3stones.snm.message.BaseMessageDecoder;
+   import us.leaf3stones.snm.server.HttpSecServer;
+   import us.leaf3stones.snm.server.HttpSecServerBuilder;
+   
+   
    public class ServerMain {
        public static void main(String[] args) throws Exception {
            HttpSecServerBuilder builder = new HttpSecServerBuilder();
@@ -460,6 +472,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            server.accept(true);
        }
    }
+   
    ```
 
 6. Run the client
