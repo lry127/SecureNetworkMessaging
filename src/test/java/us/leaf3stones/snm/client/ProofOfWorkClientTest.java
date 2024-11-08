@@ -1,9 +1,18 @@
 package us.leaf3stones.snm.client;
 
 import org.junit.jupiter.api.Test;
+import us.leaf3stones.snm.auth.AuthenticationChain;
+import us.leaf3stones.snm.auth.ProofOfWorkAuthenticator;
+import us.leaf3stones.snm.common.HttpSecPeer;
+import us.leaf3stones.snm.demo.echo.EchoMessageHandler;
+import us.leaf3stones.snm.handler.HandlerFactory;
+import us.leaf3stones.snm.handler.MessageHandler;
+import us.leaf3stones.snm.message.BaseMessageDecoder;
+import us.leaf3stones.snm.message.GeneralPayloadMessage;
+import us.leaf3stones.snm.server.HttpSecServer;
+import us.leaf3stones.snm.server.HttpSecServerBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ProofOfWorkClientTest {
 
@@ -22,5 +31,29 @@ class ProofOfWorkClientTest {
         Long res = new ProofOfWorkClient(null).computeNonceBlockingAtMost(computeAtMost, (short) 0, (short) 20);
         assertNull(res);
         bomb.interrupt();
+    }
+
+    @Test
+    void proofOfWorkInActionTest() throws Exception {
+        HttpSecServerBuilder builder = new HttpSecServerBuilder();
+        builder.setPort(5000);
+        builder.setHandlerFactory(new HandlerFactory() {
+            @Override
+            public MessageHandler createRequestHandler(HttpSecPeer peer) {
+                return new EchoMessageHandler(peer);
+            }
+        });
+        builder.setMessageDecoder(new BaseMessageDecoder());
+        builder.setAuthChain(new AuthenticationChain(ProofOfWorkAuthenticator.class));
+        HttpSecServer server = builder.build();
+        server.accept(false);
+
+        // run the client
+        HttpSecClient client = new HttpSecClient("localhost", 5000, new BaseMessageDecoder());
+        new ProofOfWorkClient(client).authenticateToServer();
+        GeneralPayloadMessage echoRequest = GeneralPayloadMessage.newInstance("echo", "hi, SecureNetworkMessaging!");
+        client.sendMessage(echoRequest);
+        GeneralPayloadMessage echoResponse = (GeneralPayloadMessage) client.readMessage();
+        assertEquals(echoRequest.getPayloadAsString(), echoResponse.getPayloadAsString());
     }
 }

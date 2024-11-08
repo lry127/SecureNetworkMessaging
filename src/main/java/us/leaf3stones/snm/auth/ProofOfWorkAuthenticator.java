@@ -5,6 +5,7 @@ import us.leaf3stones.snm.common.ProofOfWork;
 import us.leaf3stones.snm.message.AuthenticationMessage;
 import us.leaf3stones.snm.message.AuthenticationResponseMessage;
 import us.leaf3stones.snm.message.Message;
+import us.leaf3stones.snm.message.POWAuthenticationMessage;
 
 import java.io.IOException;
 import java.util.Random;
@@ -26,7 +27,7 @@ public class ProofOfWorkAuthenticator extends Authenticator {
 
     @Override
     public void authenticate() throws IOException, AuthenticationException {
-        AuthenticationMessage authMsg = AuthenticationMessage.newInstance(REQUIRED_MATCH_LENGTH, MIN_BYPASS_MILLIS, base);
+        POWAuthenticationMessage authMsg = POWAuthenticationMessage.newInstance(REQUIRED_MATCH_LENGTH, MIN_BYPASS_MILLIS, base);
         peer.sendMessage(authMsg);
         Message responseMsg = peer.readMessage();
         if (!(responseMsg instanceof AuthenticationResponseMessage authResponseMsg)) {

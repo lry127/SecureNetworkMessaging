@@ -5,6 +5,7 @@ import us.leaf3stones.snm.common.ProofOfWork;
 import us.leaf3stones.snm.message.AuthenticationMessage;
 import us.leaf3stones.snm.message.AuthenticationResponseMessage;
 import us.leaf3stones.snm.message.Message;
+import us.leaf3stones.snm.message.POWAuthenticationMessage;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,11 +19,11 @@ public class ProofOfWorkClient {
 
     public void authenticateToServer() throws IOException, SecurityException {
         Message authRequestMessage = client.readMessage();
-        if (!(authRequestMessage instanceof AuthenticationMessage)) {
+        if (!(authRequestMessage instanceof POWAuthenticationMessage)) {
             throw new IllegalStateException("wtf? server don't require auth and we consumed an message?!");
         }
         //noinspection PatternVariableCanBeUsed
-        AuthenticationMessage authMsg = (AuthenticationMessage) authRequestMessage;
+        POWAuthenticationMessage authMsg = (POWAuthenticationMessage) authRequestMessage;
 
         Long nonce = computeNonceBlockingAtMost(authMsg.getMinBypassMillis(), authMsg.getBase(), authMsg.getSpecification());
         AuthenticationResponseMessage responseMsg;

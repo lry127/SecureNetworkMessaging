@@ -20,6 +20,8 @@ public class BaseMessageDecoder extends MessageDecoder {
                 return new ResponseMessage(messageBody);
             case MessageTypeIdentifiers.TYPE_AUTHENTICATION_MESSAGE:
                 return new AuthenticationMessage(messageBody);
+            case MessageTypeIdentifiers.TYPE_POW_AUTHENTICATION_MESSAGE:
+                return new POWAuthenticationMessage(messageBody);
             case MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE:
                 return new AuthenticationResponseMessage(messageBody);
             default:
@@ -33,6 +35,7 @@ public class BaseMessageDecoder extends MessageDecoder {
                 MessageTypeIdentifiers.TYPE_GENERAL_PAYLOAD_MESSAGE,
                 MessageTypeIdentifiers.TYPE_RESPONSE_MESSAGE,
                 MessageTypeIdentifiers.TYPE_AUTHENTICATION_MESSAGE,
+                MessageTypeIdentifiers.TYPE_POW_AUTHENTICATION_MESSAGE,
                 MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE);
     }
 
@@ -41,7 +44,8 @@ public class BaseMessageDecoder extends MessageDecoder {
         public static final int TYPE_GENERAL_PAYLOAD_MESSAGE = 2;
         public static final int TYPE_RESPONSE_MESSAGE = 3;
         public static final int TYPE_AUTHENTICATION_MESSAGE = 4;
-        public static final int TYPE_AUTHENTICATION_RESPONSE_MESSAGE = 5;
+        public static final int TYPE_POW_AUTHENTICATION_MESSAGE = 5;
+        public static final int TYPE_AUTHENTICATION_RESPONSE_MESSAGE = 6;
     }
 
 }
