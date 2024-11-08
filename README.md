@@ -421,41 +421,32 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    ```java
    package us.leaf3stones.snm.demo.arithmetic;
    
-   import org.slf4j.Logger;
-   import org.slf4j.LoggerFactory;
    import us.leaf3stones.snm.common.HttpSecPeer;
+   import us.leaf3stones.snm.handler.HandlerFactory;
    import us.leaf3stones.snm.handler.MessageHandler;
-   import us.leaf3stones.snm.message.Message;
-   import us.leaf3stones.snm.message.NetIOException;
+   import us.leaf3stones.snm.message.BaseMessageDecoder;
+   import us.leaf3stones.snm.server.HttpSecServer;
+   import us.leaf3stones.snm.server.HttpSecServerBuilder;
    
    import java.io.IOException;
    
-   public class ArithmeticOperationHandler extends MessageHandler {
-       private static final Logger logger = LoggerFactory.getLogger(ArithmeticOperationHandler.class);
-   
-       public ArithmeticOperationHandler(HttpSecPeer peer) {
-           super(peer);
-       }
-   
-       @Override
-       public void takeOver() throws Exception {
-           while (true) {
-               try {
-                   if (!(peer.readMessage() instanceof ArithmeticMessage arithmeticMsg)) {
-                       throw new RuntimeException("can only handle arithmetic message");
-                   }
-                   String executedCalculation = arithmeticMsg.execute();
-                   Message response = ArithmeticResponseMessage.newInstance(executedCalculation);
-                   peer.sendMessage(response);
-               } catch (NetIOException netIOException) {
-                   if (!netIOException.isAbnormalIOException) {
-                       logger.info("client closed the connection cleanly");
-                       break;
-                   } else {
-                       throw new IOException(netIOException);
-                   }
+   public class ServerMain {
+       public static void main(String[] args) throws IOException {
+           HttpSecServerBuilder builder = new HttpSecServerBuilder();
+           builder.setPort(5000);
+           builder.setHandlerFactory(new HandlerFactory() {
+               @Override
+               public MessageHandler createRequestHandler(HttpSecPeer peer) {
+                   return new ArithmeticOperationHandler(peer);
                }
-           }
+           });
+           // though we didn't use any predefined message, we can still include the
+           // base decoder for easier migration if we later changed our minds and use
+           // a predefined message
+           builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+           builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+           HttpSecServer server = builder.build();
+           server.accept(true);
        }
    }
    
@@ -531,7 +522,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
        void onRefresh(Map<Integer, AccessLog> accessMap, long currTime);
        int getWaitingTimeFor(int ip, AccessLog accessLog);
    }
-       
+   
    public static class AccessLog {
        public List<Long> accesses = new ArrayList<>();
    }
@@ -585,7 +576,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
                    "rejecting new connections");
        }
    }
-   
    ```
    
    Set the policy in the server builder
@@ -598,19 +588,18 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    
    > ```
    > Exception in thread "main" java.net.SocketException: Connection reset by peer
-   > 	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
-   > 	at java.base/sun.nio.ch.SocketDispatcher.write(SocketDispatcher.java:62)
-   > 	at java.base/sun.nio.ch.NioSocketImpl.tryWrite(NioSocketImpl.java:394)
-   > 	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:410)
-   > 	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
-   > 	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:819)
-   > 	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1195)
-   > 	at java.base/java.io.OutputStream.write(OutputStream.java:124)
-   > 	at us.leaf3stones.snm.crypto.CryptoNegotiation.negotiateAsClient(CryptoNegotiation.java:36)
-   > 	at us.leaf3stones.snm.common.HttpSecPeer.tryToNegotiateCryptoInfo(HttpSecPeer.java:43)
-   > 	at us.leaf3stones.snm.client.HttpSecClient.<init>(HttpSecClient.java:14)
-   > 	at us.leaf3stones.snm.demo.arithmetic.ClientMain.main(ClientMain.java:11)
-   > 
+   >     at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+   >     at java.base/sun.nio.ch.SocketDispatcher.write(SocketDispatcher.java:62)
+   >     at java.base/sun.nio.ch.NioSocketImpl.tryWrite(NioSocketImpl.java:394)
+   >     at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:410)
+   >     at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
+   >     at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:819)
+   >     at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1195)
+   >     at java.base/java.io.OutputStream.write(OutputStream.java:124)
+   >     at us.leaf3stones.snm.crypto.CryptoNegotiation.negotiateAsClient(CryptoNegotiation.java:36)
+   >     at us.leaf3stones.snm.common.HttpSecPeer.tryToNegotiateCryptoInfo(HttpSecPeer.java:43)
+   >     at us.leaf3stones.snm.client.HttpSecClient.<init>(HttpSecClient.java:14)
+   >     at us.leaf3stones.snm.demo.arithmetic.ClientMain.main(ClientMain.java:11)
    > ```
 
         
