@@ -22,6 +22,5 @@ public class EchoMessageHandler extends MessageHandler {
         String message = payloadMsg.getPayloadAsString(); // client message
         Message response = GeneralPayloadMessage.newInstance("echo_response", message); // preparing response
         peer.sendMessage(response); // send it back to client
-        peer.shutdown();
     }
 }

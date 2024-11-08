@@ -55,12 +55,11 @@ Here we'll implement some simple protocols, in just a few lines
            String message = payloadMsg.getPayloadAsString(); // client message
            Message response = GeneralPayloadMessage.newInstance("echo_response", message); // preparing response
            peer.sendMessage(response); // send it back to client
-           peer.shutdown();
        }
    }
    ```
    
-   Congrats! Server now knows how to echo back to client. But how do we bring up the server?
+   Congrats! Server now knows how to echo back to client. It's time to actually run the server.
 
 2. Running the server
    
