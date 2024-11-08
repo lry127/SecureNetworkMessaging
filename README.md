@@ -441,18 +441,6 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
 5. Bringing up server. (If you run into any error related to native library, please refer to tutorial 1 and learn how to build it)
    
    ```java
-   package us.leaf3stones.snm.demo.arithmetic;
-   
-   import us.leaf3stones.snm.auth.AuthenticationChain;
-   import us.leaf3stones.snm.auth.NonceAuthenticator;
-   import us.leaf3stones.snm.common.HttpSecPeer;
-   import us.leaf3stones.snm.handler.HandlerFactory;
-   import us.leaf3stones.snm.handler.MessageHandler;
-   import us.leaf3stones.snm.message.BaseMessageDecoder;
-   import us.leaf3stones.snm.server.HttpSecServer;
-   import us.leaf3stones.snm.server.HttpSecServerBuilder;
-   
-   
    public class ServerMain {
        public static void main(String[] args) throws Exception {
            HttpSecServerBuilder builder = new HttpSecServerBuilder();
@@ -463,11 +451,10 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
                    return new ArithmeticOperationHandler(peer);
                }
            });
-           // though we didn't use any predefined message, we can still include the
-           // base decoder for easier migration if we later changed our minds and use
-           // a predefined message
+           // we used BaseMessageDecoder internally, if you have your own decoder, chain it as parent
            builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
            builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+           // fight against replay attack by using a nonce
            builder.setAuthChain(new AuthenticationChain(NonceAuthenticator.class));
            HttpSecServer server = builder.build();
            server.accept(true);

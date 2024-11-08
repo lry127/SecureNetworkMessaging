@@ -20,11 +20,10 @@ public class ServerMain {
                 return new ArithmeticOperationHandler(peer);
             }
         });
-        // though we didn't use any predefined message, we can still include the
-        // base decoder for easier migration if we later changed our minds and use
-        // a predefined message
+        // we used BaseMessageDecoder internally, if you have your own decoder, chain it as parent
         builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
         builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+        // fight against replay attack by using a nonce
         builder.setAuthChain(new AuthenticationChain(NonceAuthenticator.class));
         HttpSecServer server = builder.build();
         server.accept(true);
