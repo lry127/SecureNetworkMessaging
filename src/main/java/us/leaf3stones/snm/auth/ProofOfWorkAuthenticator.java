@@ -7,13 +7,14 @@ import us.leaf3stones.snm.message.Message;
 import us.leaf3stones.snm.message.POWAuthenticationMessage;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 public class ProofOfWorkAuthenticator extends Authenticator {
     private static final short MIN_BYPASS_MILLIS = 10 * 1000; // 10 sec
     private static final short REQUIRED_MATCH_LENGTH = 4;
 
-    private static final Random randomGenerator = new Random();
+    private static final Random randomGenerator = new SecureRandom();
 
     private final long base;
     private final long authBeginMillis;

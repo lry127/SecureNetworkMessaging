@@ -9,11 +9,9 @@ import us.leaf3stones.snm.message.POWAuthenticationMessage;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ProofOfWorkClient {
-    protected final HttpSecPeer client;
-
+public class ProofOfWorkClient extends AuthClient {
     public ProofOfWorkClient(HttpSecPeer client) {
-        this.client = client;
+        super(client);
     }
 
     public void authenticateToServer() throws IOException, SecurityException {
