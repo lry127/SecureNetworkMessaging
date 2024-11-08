@@ -14,7 +14,7 @@ public class AuthenticationMessage extends Message {
     }
 
     public static AuthenticationMessage newInstance(long base) {
-        return new AuthenticationMessage( base);
+        return new AuthenticationMessage(base);
     }
 
     @Override

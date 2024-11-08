@@ -28,6 +28,7 @@ public class PriorityMessageQueue {
     private Future<?> keepTheQueueNotEmptyTask;
     private boolean active = true;
     private Exception fatalSendException;
+
     public PriorityMessageQueue(int maxBufferedMessagesCount, ExecutorService executor, Function<Message, ?> messagePusher) {
         this.maxBufferedMessagesCount = maxBufferedMessagesCount;
         this.messagePusher = messagePusher;

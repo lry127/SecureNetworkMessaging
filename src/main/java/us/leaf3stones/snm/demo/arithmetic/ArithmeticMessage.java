@@ -8,6 +8,7 @@ public class ArithmeticMessage extends Message {
     private byte operator;
     private long operand1;
     private long operand2;
+
     public ArithmeticMessage(byte operator, long operand1, long operand2) {
         this.operator = operator;
         this.operand1 = operand1;

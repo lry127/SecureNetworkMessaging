@@ -16,6 +16,10 @@ public class POWAuthenticationMessage extends AuthenticationMessage {
         this.minBypassMillis = minBypassMillis;
     }
 
+    public static POWAuthenticationMessage newInstance(short specification, short minBypassMillis, long base) {
+        return new POWAuthenticationMessage(specification, minBypassMillis, base);
+    }
+
     @Override
     public int getTypeIdentifier() {
         return BaseMessageDecoder.MessageTypeIdentifiers.TYPE_POW_AUTHENTICATION_MESSAGE;
@@ -46,12 +50,6 @@ public class POWAuthenticationMessage extends AuthenticationMessage {
 
     public short getMinBypassMillis() {
         return minBypassMillis;
-    }
-
-
-
-    public static POWAuthenticationMessage newInstance(short specification, short minBypassMillis, long base) {
-        return new POWAuthenticationMessage(specification, minBypassMillis, base);
     }
 
 }

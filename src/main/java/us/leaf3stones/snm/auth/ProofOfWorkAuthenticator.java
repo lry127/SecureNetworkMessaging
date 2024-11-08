@@ -2,7 +2,6 @@ package us.leaf3stones.snm.auth;
 
 import us.leaf3stones.snm.common.HttpSecPeer;
 import us.leaf3stones.snm.common.ProofOfWork;
-import us.leaf3stones.snm.message.AuthenticationMessage;
 import us.leaf3stones.snm.message.AuthenticationResponseMessage;
 import us.leaf3stones.snm.message.Message;
 import us.leaf3stones.snm.message.POWAuthenticationMessage;
