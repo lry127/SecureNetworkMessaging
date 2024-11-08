@@ -24,7 +24,7 @@ A java library that helps you write your own secure network messaging system eff
 
 ## Getting Started & Tutorial
 
-Here we'll implement some simple protocols, in just a few lines
+Here we'll implement some simple protocols, in just a few lines.
 
 #### Example #1: A simple echo server
 
