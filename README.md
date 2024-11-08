@@ -6,7 +6,15 @@ A java library that helps you write your own secure network messaging system eff
 
 - [x] custom messages
 
-- [x] strong encryption by default (based on [libsodium](https://doc.libsodium.org/))
+- [x] secure transport (based on [libsodium](https://doc.libsodium.org/))
+  
+  - [x] confidentiality
+  
+  - [x] integrity
+  
+  - [x] out-of-order messages detection
+  
+  - [x] replay attack detection
 
 - [x] rate throttling
 
@@ -435,6 +443,8 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    ```java
    package us.leaf3stones.snm.demo.arithmetic;
    
+   import us.leaf3stones.snm.auth.AuthenticationChain;
+   import us.leaf3stones.snm.auth.NonceAuthenticator;
    import us.leaf3stones.snm.common.HttpSecPeer;
    import us.leaf3stones.snm.handler.HandlerFactory;
    import us.leaf3stones.snm.handler.MessageHandler;
@@ -442,10 +452,9 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    import us.leaf3stones.snm.server.HttpSecServer;
    import us.leaf3stones.snm.server.HttpSecServerBuilder;
    
-   import java.io.IOException;
    
    public class ServerMain {
-       public static void main(String[] args) throws IOException {
+       public static void main(String[] args) throws Exception {
            HttpSecServerBuilder builder = new HttpSecServerBuilder();
            builder.setPort(5000);
            builder.setHandlerFactory(new HandlerFactory() {
@@ -459,10 +468,12 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
            // a predefined message
            builder.setMessageDecoder(new ArithmeticMessageDecoder(new BaseMessageDecoder()));
            builder.setRateLimitingPolicy(new CalculatorRateLimiting());
+           builder.setAuthChain(new AuthenticationChain(NonceAuthenticator.class));
            HttpSecServer server = builder.build();
            server.accept(true);
        }
    }
+   
    ```
 
 6. Run the client
