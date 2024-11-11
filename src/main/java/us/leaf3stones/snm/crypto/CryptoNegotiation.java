@@ -1,7 +1,7 @@
 package us.leaf3stones.snm.crypto;
 
 import us.leaf3stones.snm.message.InputStreamUtil;
-import us.leaf3stones.snm.message.NetIOException;
+import us.leaf3stones.snm.common.NetIOException;
 
 import java.io.IOException;
 import java.io.InputStream;

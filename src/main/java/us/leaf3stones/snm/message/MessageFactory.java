@@ -2,6 +2,7 @@ package us.leaf3stones.snm.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.leaf3stones.snm.common.NetIOException;
 import us.leaf3stones.snm.crypto.LengthMessageCrypto;
 import us.leaf3stones.snm.crypto.NegotiatedCryptoNative;
 

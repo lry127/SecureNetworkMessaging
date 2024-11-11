@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import us.leaf3stones.snm.common.HttpSecPeer;
 import us.leaf3stones.snm.handler.MessageHandler;
 import us.leaf3stones.snm.message.Message;
-import us.leaf3stones.snm.message.NetIOException;
+import us.leaf3stones.snm.common.NetIOException;
 
 import java.io.IOException;
 

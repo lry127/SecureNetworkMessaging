@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.leaf3stones.snm.message.KeepAliveMessage;
 import us.leaf3stones.snm.message.Message;
-import us.leaf3stones.snm.message.NetIOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

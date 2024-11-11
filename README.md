@@ -404,7 +404,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    import us.leaf3stones.snm.common.HttpSecPeer;
    import us.leaf3stones.snm.handler.MessageHandler;
    import us.leaf3stones.snm.message.Message;
-   import us.leaf3stones.snm.message.NetIOException;
+   import us.leaf3stones.snm.common.NetIOException;
    
    import java.io.IOException;
    
@@ -484,7 +484,7 @@ In this tutorial, we'll implement a remote calculator using SecureNetworkMessagi
    import us.leaf3stones.snm.client.NonceAuthClient;
    import us.leaf3stones.snm.message.BaseMessageDecoder;
    import us.leaf3stones.snm.message.Message;
-   import us.leaf3stones.snm.message.NetIOException;
+   import us.leaf3stones.snm.common.NetIOException;
    
    import java.util.Scanner;
    

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import us.leaf3stones.snm.message.GeneralPayloadMessage;
 import us.leaf3stones.snm.message.KeepAliveMessage;
 import us.leaf3stones.snm.message.Message;
-import us.leaf3stones.snm.message.NetIOException;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

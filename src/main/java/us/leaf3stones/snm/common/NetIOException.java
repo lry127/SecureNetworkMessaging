@@ -1,4 +1,4 @@
-package us.leaf3stones.snm.message;
+package us.leaf3stones.snm.common;
 
 import java.io.IOException;
 
