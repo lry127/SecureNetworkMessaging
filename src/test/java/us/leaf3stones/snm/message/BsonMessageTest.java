@@ -6,6 +6,7 @@ import org.bson.types.BasicBSONList;
 import org.junit.jupiter.api.Test;
 import us.leaf3stones.snm.crypto.NativeBuffer;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -92,6 +93,37 @@ public class BsonMessageTest {
 
     }
 
+    static class ExampleBsonMessage extends BsonMessage {
+        public ExampleBsonMessage(BSONObject object) {
+            super(object);
+        }
+
+        public ExampleBsonMessage(ByteBuffer buffer) {
+            super(buffer);
+        }
+
+        @Override
+        protected int getTypeIdentifier() {
+            return 1005;
+        }
+    }
+
+    static class ListBsonMessage extends BsonMessage {
+
+        public ListBsonMessage(BSONObject object) {
+            super(object);
+        }
+
+        public ListBsonMessage(ByteBuffer buffer) {
+            super(buffer);
+        }
+
+        @Override
+        protected int getTypeIdentifier() {
+            return 1006;
+        }
+    }
+
     @Test
     void backAndForth() {
         ExampleBsonConvertable bc = new ExampleBsonConvertable("3", 1, 3.0, new byte[3]);
@@ -101,8 +133,8 @@ public class BsonMessageTest {
         buffer.wrapAsByteBuffer().get(arr);
         buffer.clean();
 
-        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, 1005);
-        BsonMessage msg = (BsonMessage) new BsonDecoder(null).decode(arr);
+        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
+        ExampleBsonMessage msg = (ExampleBsonMessage) new BsonDecoder(null).decode(arr);
         ExampleBsonConvertable recoveredConvertable = (ExampleBsonConvertable) msg.toConvertable();
         assertEquals(bc, recoveredConvertable);
     }
@@ -116,10 +148,10 @@ public class BsonMessageTest {
         buffer.wrapAsByteBuffer().get(arr);
         buffer.clean();
 
-        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, 1005);
-        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, 1006);
+        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
+        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class,1006);
 
-        BsonMessage msg = (BsonMessage) new BsonDecoder(null).decode(arr);
+        ListBsonMessage msg = (ListBsonMessage) new BsonDecoder(null).decode(arr);
         msg.toConvertable();
         assertTrue(ListBsonConvertable.called);
 

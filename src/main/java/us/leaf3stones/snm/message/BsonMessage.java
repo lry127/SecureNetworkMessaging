@@ -18,8 +18,11 @@ public abstract class BsonMessage extends Message {
         data = object;
     }
 
-    public BsonMessage(ByteBuffer buffer, Method backConverter) {
+    public BsonMessage(ByteBuffer buffer) {
         super(buffer);
+    }
+
+    void setBackConverter(Method backConverter) {
         this.backConverter = backConverter;
     }
 
