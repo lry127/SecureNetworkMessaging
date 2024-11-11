@@ -39,11 +39,11 @@ public abstract class MessageDecoder {
     protected abstract Set<Integer> getConvertableMessageIds();
 
     public static class DecodeException extends RuntimeException {
-        protected DecodeException(String message) {
+        public DecodeException(String message) {
             super(message);
         }
 
-        protected DecodeException(Exception e) {
+        public DecodeException(Exception e) {
             super(e);
         }
     }
