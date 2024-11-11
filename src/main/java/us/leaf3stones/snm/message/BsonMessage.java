@@ -8,14 +8,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-public abstract class BsonMessage extends Message {
+public abstract class BsonMessage<T extends BsonConvertable> extends Message {
     private Method backConverter;
 
     private BSONObject data;
     private byte[] cachedSerialization;
 
-    public BsonMessage(BSONObject object) {
-        data = object;
+    public BsonMessage(T convertable) {
+        data = convertable.convertToBson();
     }
 
     public BsonMessage(ByteBuffer buffer) {
@@ -42,18 +42,10 @@ public abstract class BsonMessage extends Message {
         data = new BasicBSONDecoder().readObject(sizedRead(buf));
     }
 
-    public static BsonMessage fromConvertable(BsonConvertable convertable, int messageId) {
-        return new BsonMessage(convertable.convertToBson()) {
-            @Override
-            protected int getTypeIdentifier() {
-                return messageId;
-            }
-        };
-    }
 
-    public BsonConvertable toConvertable() {
+    public T convertBack() {
         try {
-            return (BsonConvertable) backConverter.invoke(null, data);
+            return (T) backConverter.invoke(null, data);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
