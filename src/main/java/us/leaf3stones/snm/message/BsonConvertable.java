@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface BsonConvertable {
     class Helper {
-        static <T extends BsonConvertable> BasicBSONList toBsonList(List<T> convertableArray) {
+        public static <T extends BsonConvertable> BasicBSONList toBsonList(List<T> convertableArray) {
             BasicBSONList list = new BasicBSONList();
             if (convertableArray != null) {
                 for (T conv : convertableArray) {
@@ -25,7 +25,7 @@ public interface BsonConvertable {
             return list;
         }
 
-        static <T extends BsonConvertable> List<T> fromBsonList(BasicBSONList list, Method converter) {
+        public static <T extends BsonConvertable> List<T> fromBsonList(BasicBSONList list, Method converter) {
             ArrayList<T> arr = new ArrayList<>();
             for (Object convertable : list) {
                 try {
@@ -37,5 +37,6 @@ public interface BsonConvertable {
             return arr;
         }
     }
+
     BSONObject convertToBson();
 }
