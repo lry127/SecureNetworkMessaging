@@ -1,7 +1,6 @@
 package us.leaf3stones.snm.message;
 
 import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
 import org.bson.types.BasicBSONList;
 import org.junit.jupiter.api.Test;
 import us.leaf3stones.snm.crypto.NativeBuffer;
@@ -43,13 +42,11 @@ public class BsonMessageTest {
         }
 
         @Override
-        public BSONObject convertToBson() {
-            BSONObject obj = new BasicBSONObject();
+        public void convertToBson(BSONObject obj) {
             obj.put("str", stringData);
             obj.put("int", intData);
             obj.put("double", doubleData);
             obj.put("byteArray", byteArrayData);
-            return obj;
         }
 
         public static ExampleBsonConvertable fromBson(BSONObject obj) {
@@ -65,15 +62,13 @@ public class BsonMessageTest {
         static boolean called = false;
 
         @Override
-        public BSONObject convertToBson() {
+        public void convertToBson(BSONObject bo) {
             ArrayList<ExampleBsonConvertable> list = new ArrayList<>();
             for (int i = 0; i < 3; ++i) {
                 list.add(new ExampleBsonConvertable("str", 5, 10.0, new byte[i]));
             }
-            BSONObject bo = new BasicBSONObject();
             bo.put("data", 3);
             bo.put("list", Helper.toBsonList(list));
-            return bo;
         }
 
         public static ListBsonConvertable fromBson(BSONObject bo) {

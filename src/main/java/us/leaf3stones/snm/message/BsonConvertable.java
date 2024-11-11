@@ -1,6 +1,7 @@
 package us.leaf3stones.snm.message;
 
 import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 import org.bson.types.BasicBSONList;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,12 +20,15 @@ public interface BsonConvertable {
             BasicBSONList list = new BasicBSONList();
             if (convertableArray != null) {
                 for (T conv : convertableArray) {
-                    list.add(conv.convertToBson());
+                    BSONObject bson = new BasicBSONObject();
+                    conv.convertToBson(bson);
+                    list.add(bson);
                 }
             }
             return list;
         }
 
+        @SuppressWarnings("unchecked")
         public static <T extends BsonConvertable> List<T> fromBsonList(BasicBSONList list, Method converter) {
             ArrayList<T> arr = new ArrayList<>();
             for (Object convertable : list) {
@@ -38,5 +42,5 @@ public interface BsonConvertable {
         }
     }
 
-    BSONObject convertToBson();
+    void convertToBson(BSONObject bson);
 }

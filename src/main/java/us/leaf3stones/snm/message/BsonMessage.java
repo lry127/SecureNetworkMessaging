@@ -3,6 +3,7 @@ package us.leaf3stones.snm.message;
 import org.bson.BSONObject;
 import org.bson.BasicBSONDecoder;
 import org.bson.BasicBSONEncoder;
+import org.bson.BasicBSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +16,8 @@ public abstract class BsonMessage<T extends BsonConvertable> extends Message {
     private byte[] cachedSerialization;
 
     public BsonMessage(T convertable) {
-        data = convertable.convertToBson();
+        data = new BasicBSONObject();
+        convertable.convertToBson(data);
     }
 
     public BsonMessage(ByteBuffer buffer) {
