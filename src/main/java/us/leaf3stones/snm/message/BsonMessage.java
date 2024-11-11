@@ -3,7 +3,6 @@ package us.leaf3stones.snm.message;
 import org.bson.BSONObject;
 import org.bson.BasicBSONDecoder;
 import org.bson.BasicBSONEncoder;
-import org.bson.ByteBuf;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,7 +26,7 @@ public abstract class BsonMessage extends Message {
     @Override
     protected int peekDataSize() {
         cachedSerialization = new BasicBSONEncoder().encode(data);
-        return cachedSerialization.length;
+        return lengthWithHeader(cachedSerialization);
     }
 
     @Override
@@ -40,7 +39,7 @@ public abstract class BsonMessage extends Message {
         data = new BasicBSONDecoder().readObject(sizedRead(buf));
     }
 
-    public static BsonMessage toMessage(BsonConvertable convertable, int messageId) {
+    public static BsonMessage fromConvertable(BsonConvertable convertable, int messageId) {
         return new BsonMessage(convertable.convertToBson()) {
             @Override
             protected int getTypeIdentifier() {
@@ -49,7 +48,7 @@ public abstract class BsonMessage extends Message {
         };
     }
 
-    public BsonConvertable convertBackToObject() {
+    public BsonConvertable toConvertable() {
         try {
             return (BsonConvertable) backConverter.invoke(null, data);
         } catch (IllegalAccessException | InvocationTargetException e) {

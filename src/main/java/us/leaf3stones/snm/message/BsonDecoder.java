@@ -19,6 +19,10 @@ public class BsonDecoder extends MessageDecoder {
         }
     }
 
+    public static Method getConverter(int messageId) {
+        return registeredBsonMessages.get(messageId);
+    }
+
     public BsonDecoder(MessageDecoder parent) {
         super(parent);
     }

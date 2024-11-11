@@ -1,10 +1,15 @@
 package us.leaf3stones.snm.message;
 
+import us.leaf3stones.snm.crypto.CryptoInitializer;
 import us.leaf3stones.snm.crypto.NativeBuffer;
 
 import java.nio.ByteBuffer;
 
 public abstract class Message {
+    static {
+        CryptoInitializer.initNativeCrypto();
+    }
+
     public Message(ByteBuffer buffer) {
         try {
             constructMessage(buffer);

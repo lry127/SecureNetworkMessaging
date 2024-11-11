@@ -35,8 +35,9 @@ class ProofOfWorkClientTest {
 
     @Test
     void proofOfWorkInActionTest() throws Exception {
+        GeneralPayloadMessage.newInstance("hi", new byte[0]);
         HttpSecServerBuilder builder = new HttpSecServerBuilder();
-        builder.setPort(5000);
+        builder.setPort(5008);
         builder.setHandlerFactory(new HandlerFactory() {
             @Override
             public MessageHandler createRequestHandler(HttpSecPeer peer) {
@@ -49,7 +50,7 @@ class ProofOfWorkClientTest {
         server.accept(false);
 
         // run the client
-        HttpSecClient client = new HttpSecClient("localhost", 5000, new BaseMessageDecoder());
+        HttpSecClient client = new HttpSecClient("localhost", 5008, new BaseMessageDecoder());
         new ProofOfWorkClient(client).authenticateToServer();
         GeneralPayloadMessage echoRequest = GeneralPayloadMessage.newInstance("echo", "hi, SecureNetworkMessaging!");
         client.sendMessage(echoRequest);

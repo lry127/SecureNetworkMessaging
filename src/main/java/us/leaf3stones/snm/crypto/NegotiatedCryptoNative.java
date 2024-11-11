@@ -9,10 +9,6 @@ public class NegotiatedCryptoNative {
     public static final int KEY_EXCHANGE_KEY_SIZE = 32;
     private static final int SYMMETRIC_CRYPTO_KEY_SIZE = 32;
 
-    static {
-        CryptoInitializer.initNativeCrypto();
-    }
-
     private final byte[] transmitKey = new byte[SYMMETRIC_CRYPTO_KEY_SIZE];
     private final byte[] receiveKey = new byte[SYMMETRIC_CRYPTO_KEY_SIZE];
     private final byte[] myKeyExchangePublicKey = new byte[KEY_EXCHANGE_KEY_SIZE];
