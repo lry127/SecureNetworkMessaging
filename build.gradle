@@ -1,9 +1,9 @@
 plugins {
     id 'com.gradleup.shadow' version '8.3.3'
-    id 'java'
+    id 'java-library'
 }
 
-group = 'us.leaf3stones.authenticator'
+group = 'us.leaf3stones.SecureNetworkMessaging'
 version = '1.0-SNAPSHOT'
 
 jar {
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
 //    implementation 'org.json:json:20240303'
-    implementation 'org.mongodb:bson:5.2.1'
+    api 'org.mongodb:bson:5.2.1'
 
     implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
