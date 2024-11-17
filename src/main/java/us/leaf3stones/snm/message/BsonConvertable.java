@@ -11,8 +11,7 @@ import java.util.List;
 
 /**
  * convenient class when dealing the (de)serialization of complex data structure <br>
- * any class implements this interface should also have a method having this signature
- * <code>public static BsonConvertable fromBson(BSONObject)</code>
+ * any class implements this interface should also have a constructor that takes no arguments
  */
 public interface BsonConvertable {
     void fromBson(BsonObjectCompact bson);
