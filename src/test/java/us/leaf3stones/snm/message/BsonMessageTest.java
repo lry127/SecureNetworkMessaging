@@ -1,7 +1,6 @@
 package us.leaf3stones.snm.message;
 
 import org.bson.BSONObject;
-import org.bson.types.BasicBSONList;
 import org.junit.jupiter.api.Test;
 import us.leaf3stones.snm.crypto.NativeBuffer;
 
@@ -11,9 +10,41 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BsonMessageTest {
+    @Test
+    void backAndForth() {
+        ExampleBsonConvertable bc = new ExampleBsonConvertable("3", 1, 3.0, new byte[3]);
+        Message bm = new ExampleBsonMessage(bc);
+        NativeBuffer buffer = bm.serialize();
+        byte[] arr = new byte[(int) buffer.size()];
+        buffer.wrapAsByteBuffer().get(arr);
+        buffer.clean();
+
+        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
+        ExampleBsonMessage msg = (ExampleBsonMessage) new BsonDecoder(null).decode(arr);
+        ExampleBsonConvertable recoveredConvertable = msg.convertBack();
+        assertEquals(bc, recoveredConvertable);
+    }
+
+    @Test
+    void complexArray() {
+        Message bm = new ListBsonMessage(new ListBsonConvertable());
+        NativeBuffer buffer = bm.serialize();
+        byte[] arr = new byte[(int) buffer.size()];
+        buffer.wrapAsByteBuffer().get(arr);
+        buffer.clean();
+
+        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
+        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class, 1006);
+
+        ListBsonMessage msg = (ListBsonMessage) new BsonDecoder(null).decode(arr);
+        msg.convertBack();
+        assertTrue(ListBsonConvertable.called);
+    }
+
     static class ExampleBsonConvertable implements BsonConvertable {
         private String stringData;
         private int intData;
@@ -79,7 +110,7 @@ public class BsonMessageTest {
         }
 
         public void fromBson(BsonObjectCompact bo) {
-            assertEquals(3,  (Integer) bo.get("data"));
+            assertEquals(3, bo.<Integer>get("data"));
             List<ExampleBsonConvertable> list = BsonConvertable.Helper.fromBsonList(bo.get("list"), 1005);
             assertEquals(3, list.size());
             for (int i = 0; i < 3; ++i) {
@@ -123,36 +154,5 @@ public class BsonMessageTest {
         protected int getTypeIdentifier() {
             return 1006;
         }
-    }
-
-    @Test
-    void backAndForth() {
-        ExampleBsonConvertable bc = new ExampleBsonConvertable("3", 1, 3.0, new byte[3]);
-        Message bm = new ExampleBsonMessage(bc);
-        NativeBuffer buffer = bm.serialize();
-        byte[] arr = new byte[(int) buffer.size()];
-        buffer.wrapAsByteBuffer().get(arr);
-        buffer.clean();
-
-        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
-        ExampleBsonMessage msg = (ExampleBsonMessage) new BsonDecoder(null).decode(arr);
-        ExampleBsonConvertable recoveredConvertable = msg.convertBack();
-        assertEquals(bc, recoveredConvertable);
-    }
-
-    @Test
-    void complexArray() {
-        Message bm = new ListBsonMessage(new ListBsonConvertable());
-        NativeBuffer buffer = bm.serialize();
-        byte[] arr = new byte[(int) buffer.size()];
-        buffer.wrapAsByteBuffer().get(arr);
-        buffer.clean();
-
-        BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
-        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class, 1006);
-
-        ListBsonMessage msg = (ListBsonMessage) new BsonDecoder(null).decode(arr);
-        msg.convertBack();
-        assertTrue(ListBsonConvertable.called);
     }
 }

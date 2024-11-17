@@ -11,6 +11,10 @@ public class BsonDecoder extends MessageDecoder {
     private static final Map<Integer, Constructor<? extends BsonConvertable>> registeredBsonConverters = new HashMap<>();
     private static final Map<Integer, Constructor<? extends BsonMessage<?>>> registeredBsonMessageConstructors = new HashMap<>();
 
+    public BsonDecoder(MessageDecoder parent) {
+        super(parent);
+    }
+
     public static void registerBsonMessage(Class<? extends BsonConvertable> convertableClass,
                                            Class<? extends BsonMessage<?>> messageClass, int messageId) {
         try {
@@ -25,10 +29,6 @@ public class BsonDecoder extends MessageDecoder {
 
     public static Constructor<?> getConstructor(int messageId) {
         return registeredBsonConverters.get(messageId);
-    }
-
-    public BsonDecoder(MessageDecoder parent) {
-        super(parent);
     }
 
     @Override

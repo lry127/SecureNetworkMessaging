@@ -2,9 +2,9 @@ package us.leaf3stones.snm.demo.arithmetic;
 
 import us.leaf3stones.snm.client.HttpSecClient;
 import us.leaf3stones.snm.client.NonceAuthClient;
+import us.leaf3stones.snm.common.NetIOException;
 import us.leaf3stones.snm.message.BaseMessageDecoder;
 import us.leaf3stones.snm.message.Message;
-import us.leaf3stones.snm.common.NetIOException;
 
 import java.util.Scanner;
 

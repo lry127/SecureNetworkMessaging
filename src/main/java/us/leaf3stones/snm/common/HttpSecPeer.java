@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.leaf3stones.snm.crypto.CryptoNegotiation;
 import us.leaf3stones.snm.crypto.NegotiatedCryptoNative;
-import us.leaf3stones.snm.message.*;
+import us.leaf3stones.snm.message.KeepAliveMessage;
+import us.leaf3stones.snm.message.Message;
+import us.leaf3stones.snm.message.MessageDecoder;
+import us.leaf3stones.snm.message.MessageFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

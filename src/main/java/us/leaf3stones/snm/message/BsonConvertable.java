@@ -15,6 +15,10 @@ import java.util.List;
  * <code>public static BsonConvertable fromBson(BSONObject)</code>
  */
 public interface BsonConvertable {
+    void fromBson(BsonObjectCompact bson);
+
+    void convertToBson(BSONObject bson);
+
     class Helper {
         public static <T extends BsonConvertable> BasicBSONList toBsonList(List<T> convertableArray) {
             BasicBSONList list = new BasicBSONList();
@@ -44,7 +48,4 @@ public interface BsonConvertable {
             return arr;
         }
     }
-
-    void fromBson(BsonObjectCompact bson);
-    void convertToBson(BSONObject bson);
 }
