@@ -1,23 +1,20 @@
 package us.leaf3stones.snm.message;
 
-import org.bson.BSONObject;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class BsonDecoder extends MessageDecoder {
-    private static final Map<Integer, Method> registeredBsonConverters = new HashMap<>();
+    private static final Map<Integer, Constructor<? extends BsonConvertable>> registeredBsonConverters = new HashMap<>();
     private static final Map<Integer, Constructor<? extends BsonMessage<?>>> registeredBsonMessageConstructors = new HashMap<>();
 
     public static void registerBsonMessage(Class<? extends BsonConvertable> convertableClass,
                                            Class<? extends BsonMessage<?>> messageClass, int messageId) {
         try {
-            Method converter = convertableClass.getMethod("fromBson", BSONObject.class);
+            Constructor<? extends BsonConvertable> converter = convertableClass.getConstructor();
             Constructor<? extends BsonMessage<?>> constructor = messageClass.getConstructor(ByteBuffer.class);
             registeredBsonConverters.put(messageId, converter);
             registeredBsonMessageConstructors.put(messageId, constructor);
@@ -26,7 +23,7 @@ public class BsonDecoder extends MessageDecoder {
         }
     }
 
-    public static Method getConverter(int messageId) {
+    public static Constructor<?> getConstructor(int messageId) {
         return registeredBsonConverters.get(messageId);
     }
 
@@ -37,7 +34,7 @@ public class BsonDecoder extends MessageDecoder {
     @Override
     protected Message convert(int messageId, ByteBuffer messageBody) throws DecodeException {
         if (registeredBsonConverters.containsKey(messageId)) {
-            Method converter = registeredBsonConverters.get(messageId);
+            Constructor<?> converter = registeredBsonConverters.get(messageId);
             Constructor<? extends BsonMessage<?>> messageConstructor = registeredBsonMessageConstructors.get(messageId);
             try {
                 BsonMessage<?> bsonMsg = messageConstructor.newInstance(messageBody);

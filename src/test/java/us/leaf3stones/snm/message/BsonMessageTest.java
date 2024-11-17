@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BsonMessageTest {
     static class ExampleBsonConvertable implements BsonConvertable {
@@ -20,6 +19,10 @@ public class BsonMessageTest {
         private int intData;
         private double doubleData;
         private byte[] byteArrayData;
+
+        public ExampleBsonConvertable() {
+
+        }
 
         public ExampleBsonConvertable(String stringData, int intData, double doubleData, byte[] byteArrayData) {
             this.stringData = stringData;
@@ -49,17 +52,21 @@ public class BsonMessageTest {
             obj.put("byteArray", byteArrayData);
         }
 
-        public static ExampleBsonConvertable fromBson(BSONObject obj) {
-            String str = (String) obj.get("str");
-            int intValue = (int) obj.get("int");
-            double doubleValue = (double) obj.get("double");
-            byte[] ba = (byte[]) obj.get("byteArray");
-            return new ExampleBsonConvertable(str, intValue, doubleValue, ba);
+        @Override
+        public void fromBson(BsonObjectCompact obj) {
+            stringData = obj.requireObject("str");
+            intData = obj.requireObject("int");
+            doubleData = obj.requireObject("double");
+            byteArrayData = obj.requireObject("byteArray");
         }
     }
 
     static class ListBsonConvertable implements BsonConvertable {
         static boolean called = false;
+
+        public ListBsonConvertable() {
+
+        }
 
         @Override
         public void convertToBson(BSONObject bo) {
@@ -71,11 +78,11 @@ public class BsonMessageTest {
             bo.put("list", Helper.toBsonList(list));
         }
 
-        public static ListBsonConvertable fromBson(BSONObject bo) {
-            assertEquals(3, bo.get("data"));
-            List<ExampleBsonConvertable> list = BsonConvertable.Helper.fromBsonList((BasicBSONList) bo.get("list"), BsonDecoder.getConverter(1005));
+        public void fromBson(BsonObjectCompact bo) {
+            assertEquals(3,  (Integer) bo.get("data"));
+            List<ExampleBsonConvertable> list = BsonConvertable.Helper.fromBsonList(bo.get("list"), 1005);
             assertEquals(3, list.size());
-            for (int i = 0; i < 3; ++i ) {
+            for (int i = 0; i < 3; ++i) {
                 ExampleBsonConvertable convertable = list.get(i);
                 assertEquals("str", convertable.stringData);
                 assertEquals(5, convertable.intData);
@@ -83,7 +90,6 @@ public class BsonMessageTest {
                 assertEquals(i, convertable.byteArrayData.length);
             }
             called = true;
-            return new ListBsonConvertable();
         }
 
     }
@@ -143,7 +149,7 @@ public class BsonMessageTest {
         buffer.clean();
 
         BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
-        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class,1006);
+        BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class, 1006);
 
         ListBsonMessage msg = (ListBsonMessage) new BsonDecoder(null).decode(arr);
         msg.convertBack();

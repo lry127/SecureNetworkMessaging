@@ -4,8 +4,8 @@ import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 import org.bson.types.BasicBSONList;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +29,15 @@ public interface BsonConvertable {
         }
 
         @SuppressWarnings("unchecked")
-        public static <T extends BsonConvertable> List<T> fromBsonList(BasicBSONList list, Method converter) {
+        public static <T extends BsonConvertable> List<T> fromBsonList(BasicBSONList list, int listItemMessageId) {
             ArrayList<T> arr = new ArrayList<>();
             for (Object convertable : list) {
                 try {
-                    arr.add((T) converter.invoke(null, convertable));
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                    Constructor<T> itemConstructor = (Constructor<T>) BsonDecoder.getConstructor(listItemMessageId);
+                    T instance = itemConstructor.newInstance();
+                    instance.fromBson(new BsonObjectCompact((BSONObject) convertable));
+                    arr.add(instance);
+                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -42,5 +45,6 @@ public interface BsonConvertable {
         }
     }
 
+    void fromBson(BsonObjectCompact bson);
     void convertToBson(BSONObject bson);
 }

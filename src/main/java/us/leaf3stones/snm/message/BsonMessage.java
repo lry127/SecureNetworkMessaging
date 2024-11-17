@@ -5,12 +5,12 @@ import org.bson.BasicBSONDecoder;
 import org.bson.BasicBSONEncoder;
 import org.bson.BasicBSONObject;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 public abstract class BsonMessage<T extends BsonConvertable> extends Message {
-    private Method backConverter;
+    private Constructor<T> constructor;
 
     private BSONObject data;
     private byte[] cachedSerialization;
@@ -24,8 +24,9 @@ public abstract class BsonMessage<T extends BsonConvertable> extends Message {
         super(buffer);
     }
 
-    void setBackConverter(Method backConverter) {
-        this.backConverter = backConverter;
+    @SuppressWarnings("unchecked")
+    void setBackConverter(Constructor<?> constructor) {
+        this.constructor = (Constructor<T>) constructor;
     }
 
     @Override
@@ -47,8 +48,10 @@ public abstract class BsonMessage<T extends BsonConvertable> extends Message {
 
     public T convertBack() {
         try {
-            return (T) backConverter.invoke(null, data);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            T instance = constructor.newInstance();
+            instance.fromBson(new BsonObjectCompact(data));
+            return instance;
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new RuntimeException(e);
         }
     }
