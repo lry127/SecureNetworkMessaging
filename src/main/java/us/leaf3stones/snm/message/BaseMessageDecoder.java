@@ -24,6 +24,8 @@ public class BaseMessageDecoder extends MessageDecoder {
                 return new POWAuthenticationMessage(messageBody);
             case MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE:
                 return new AuthenticationResponseMessage(messageBody);
+            case MessageTypeIdentifiers.TYPE_GENERAL_FAILURE_MESSAGE:
+                return new GeneralFailureResponse(messageBody);
             default:
                 throw new AssertionError("can't reach here");
         }
@@ -36,7 +38,8 @@ public class BaseMessageDecoder extends MessageDecoder {
                 MessageTypeIdentifiers.TYPE_RESPONSE_MESSAGE,
                 MessageTypeIdentifiers.TYPE_AUTHENTICATION_MESSAGE,
                 MessageTypeIdentifiers.TYPE_POW_AUTHENTICATION_MESSAGE,
-                MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE);
+                MessageTypeIdentifiers.TYPE_AUTHENTICATION_RESPONSE_MESSAGE,
+                MessageTypeIdentifiers.TYPE_GENERAL_FAILURE_MESSAGE);
     }
 
     public static class MessageTypeIdentifiers {
@@ -46,6 +49,7 @@ public class BaseMessageDecoder extends MessageDecoder {
         public static final int TYPE_AUTHENTICATION_MESSAGE = 4;
         public static final int TYPE_POW_AUTHENTICATION_MESSAGE = 5;
         public static final int TYPE_AUTHENTICATION_RESPONSE_MESSAGE = 6;
+        public static final int TYPE_GENERAL_FAILURE_MESSAGE = 7;
     }
 
 }
