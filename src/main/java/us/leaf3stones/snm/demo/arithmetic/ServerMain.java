@@ -13,7 +13,7 @@ import us.leaf3stones.snm.server.HttpSecServerBuilder;
 public class ServerMain {
     public static void main(String[] args) throws Exception {
         HttpSecServerBuilder builder = new HttpSecServerBuilder();
-        builder.setPort(5000);
+        builder.setPort(25101);
         builder.setHandlerFactory(new HandlerFactory() {
             @Override
             public MessageHandler createRequestHandler(HttpSecPeer peer) {

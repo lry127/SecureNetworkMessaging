@@ -1,6 +1,7 @@
 package us.leaf3stones.snm.message;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ public abstract class MessageDecoder {
         }
 
         ByteBuffer buffer = ByteBuffer.wrap(message);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
         int type = buffer.getInt();
 
         MessageDecoder decoder = this;

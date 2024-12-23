@@ -1,14 +1,10 @@
 package us.leaf3stones.snm.message;
 
-import us.leaf3stones.snm.crypto.CryptoInitializer;
-import us.leaf3stones.snm.crypto.NativeBuffer;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public abstract class Message {
-    static {
-        CryptoInitializer.initNativeCrypto();
-    }
 
     public Message(ByteBuffer buffer) {
         try {
@@ -38,17 +34,17 @@ public abstract class Message {
         return result;
     }
 
-    NativeBuffer serialize() {
-        NativeBuffer nativeBuffer = new NativeBuffer(Integer.BYTES + peekDataSize());
+    byte[] serialize() {
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES * 2 + peekDataSize());
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
         try {
-            ByteBuffer wrapped = nativeBuffer.wrapAsByteBuffer();
-            wrapped.putInt(getTypeIdentifier());
-            serialize(wrapped);
+            buffer.putInt(buffer.capacity() - Integer.BYTES); // how many bytes remaining?
+            buffer.putInt(getTypeIdentifier());
+            serialize(buffer);
         } catch (Exception e) {
-            nativeBuffer.clean();
             throw new RuntimeException("failed to serialize: " + e.getMessage());
         }
-        return nativeBuffer;
+        return buffer.array();
     }
 
     protected abstract int getTypeIdentifier();

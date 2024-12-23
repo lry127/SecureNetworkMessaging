@@ -2,7 +2,6 @@ package us.leaf3stones.snm.message;
 
 import org.bson.BSONObject;
 import org.junit.jupiter.api.Test;
-import us.leaf3stones.snm.crypto.NativeBuffer;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -18,10 +17,9 @@ public class BsonMessageTest {
     void backAndForth() {
         ExampleBsonConvertable bc = new ExampleBsonConvertable("3", 1, 3.0, new byte[3]);
         Message bm = new ExampleBsonMessage(bc);
-        NativeBuffer buffer = bm.serialize();
-        byte[] arr = new byte[(int) buffer.size()];
-        buffer.wrapAsByteBuffer().get(arr);
-        buffer.clean();
+        byte[] buffer = bm.serialize();
+        byte[] arr = new byte[buffer.length - Integer.BYTES];
+        System.arraycopy(buffer, 4, arr, 0, arr.length);
 
         BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
         ExampleBsonMessage msg = (ExampleBsonMessage) new BsonDecoder(null).decode(arr);
@@ -32,10 +30,9 @@ public class BsonMessageTest {
     @Test
     void complexArray() {
         Message bm = new ListBsonMessage(new ListBsonConvertable());
-        NativeBuffer buffer = bm.serialize();
-        byte[] arr = new byte[(int) buffer.size()];
-        buffer.wrapAsByteBuffer().get(arr);
-        buffer.clean();
+        byte[] buffer = bm.serialize();
+        byte[] arr = new byte[buffer.length - Integer.BYTES];
+        System.arraycopy(buffer, 4, arr, 0, arr.length);
 
         BsonDecoder.registerBsonMessage(ExampleBsonConvertable.class, ExampleBsonMessage.class, 1005);
         BsonDecoder.registerBsonMessage(ListBsonConvertable.class, ListBsonMessage.class, 1006);

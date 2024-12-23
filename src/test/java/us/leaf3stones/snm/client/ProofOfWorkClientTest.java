@@ -50,7 +50,7 @@ class ProofOfWorkClientTest {
         server.accept(false);
 
         // run the client
-        HttpSecClient client = new HttpSecClient("localhost", 5008, new BaseMessageDecoder());
+        HttpSecClient client = HttpSecClient.connectToServer("localhost", 5008, new BaseMessageDecoder());
         new ProofOfWorkClient(client).authenticateToServer();
         GeneralPayloadMessage echoRequest = GeneralPayloadMessage.newInstance("echo", "hi, SecureNetworkMessaging!");
         client.sendMessage(echoRequest);

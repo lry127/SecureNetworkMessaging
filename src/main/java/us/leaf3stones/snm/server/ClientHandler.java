@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import us.leaf3stones.snm.auth.AuthenticationChain;
 import us.leaf3stones.snm.auth.Authenticator;
 import us.leaf3stones.snm.common.HttpSecPeer;
-import us.leaf3stones.snm.crypto.LengthMessageCrypto;
 import us.leaf3stones.snm.handler.HandlerFactory;
 import us.leaf3stones.snm.handler.MessageHandler;
 import us.leaf3stones.snm.message.MessageDecoder;
@@ -44,9 +43,6 @@ public class ClientHandler implements Runnable {
             int ip = ipv4ToInt(client.getPeerSocket().getInetAddress().getHostAddress());
             int sleepMillis = RateLimiting.getInstance().getWaitingTimeFor(ip);
             Thread.sleep(sleepMillis);
-
-            client.tryToNegotiateCryptoInfo(LengthMessageCrypto.serverKeyExchangePublicKey,
-                    LengthMessageCrypto.serverKeyExchangePrivateKey, true);
 
             authChain.authenticate(client);
             MessageHandler clientMessageHandler = handlerFactory.createRequestHandler(client);

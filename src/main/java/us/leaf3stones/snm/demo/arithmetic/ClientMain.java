@@ -12,7 +12,7 @@ public class ClientMain {
     private static HttpSecClient client;
 
     public static void main(String[] args) throws Exception {
-        client = new HttpSecClient("localhost", 5000, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
+        client =  HttpSecClient.connectToServer("localhost", 25101, new ArithmeticMessageDecoder(new BaseMessageDecoder()));
         new NonceAuthClient(client).authenticateToServer();
         client.enableKeepAlive(10_000);
         try (Scanner scanner = new Scanner(System.in)) {

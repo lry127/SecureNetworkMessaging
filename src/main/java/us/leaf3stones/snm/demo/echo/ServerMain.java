@@ -12,7 +12,7 @@ import java.io.IOException;
 public class ServerMain {
     public static void main(String[] args) throws IOException {
         HttpSecServerBuilder builder = new HttpSecServerBuilder();
-        builder.setPort(5000);
+        builder.setPort(25100);
         builder.setHandlerFactory(new HandlerFactory() {
             @Override
             public MessageHandler createRequestHandler(HttpSecPeer peer) {
