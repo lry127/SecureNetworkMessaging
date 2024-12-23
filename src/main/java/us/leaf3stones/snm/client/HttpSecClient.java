@@ -18,38 +18,38 @@ public class HttpSecClient extends HttpSecPeer {
     }
 
     public static HttpSecClient connectToServer(String host, int port, MessageDecoder decoder, Certificate caCert,
-                                                KeyStore myKeyStore, char[] myKsPassword) {
-        try {
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(myKeyStore, myKsPassword);
+                                                KeyStore myKeyStore, char[] myKsPassword) throws Exception {
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(myKeyStore, myKsPassword);
 
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);  // Initialize an empty truststore
-            trustStore.setCertificateEntry("caCert", caCert);
-            tmf.init(trustStore);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        trustStore.load(null, null);  // Initialize an empty truststore
+        trustStore.setCertificateEntry("caCert", caCert);
+        tmf.init(trustStore);
 
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
-            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-            SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket(host, port);
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+        SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+        SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket(host, port);
 
-            return new HttpSecClient(socket, decoder);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return new HttpSecClient(socket, decoder);
+    }
+
+    public static HttpSecClient connectToServer(String host, int port, MessageDecoder decoder, InputStream ksIn, char[] password) throws Exception {
+        KeyStore clientKeystore = KeyStore.getInstance("PKCS12");
+        clientKeystore.load(ksIn, password);
+
+        Certificate[] certChain = clientKeystore.getCertificateChain("1");
+        Certificate caCert = certChain[certChain.length - 1];
+
+        return connectToServer(host, port, decoder, caCert, clientKeystore, password);
     }
 
     public static HttpSecClient connectToServer(String host, int port, MessageDecoder decoder) {
         try(InputStream keystoreInputStream = HttpSecClient.class.getResourceAsStream("/client.p12")) {
             final char[] testKeyStorePassword = "password".toCharArray();
-            KeyStore clientKeystore = KeyStore.getInstance("PKCS12");
-            clientKeystore.load(keystoreInputStream, testKeyStorePassword);
-
-            Certificate[] certChain = clientKeystore.getCertificateChain("1");
-            Certificate caCert = certChain[certChain.length - 1];
-
-            return connectToServer(host, port, decoder, caCert, clientKeystore, testKeyStorePassword);
+            return connectToServer(host, port, decoder, keystoreInputStream, testKeyStorePassword);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

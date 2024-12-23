@@ -45,6 +45,7 @@ public class HttpSecServer {
     public void accept(boolean shouldBlock) throws IOException {
         serverSocket = (SSLServerSocket) sslContext.getServerSocketFactory().createServerSocket(port, 0, Inet4Address.getLoopbackAddress());
         serverSocket.setEnabledProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+        serverSocket.setNeedClientAuth(true);
 
         Runnable acceptWork = () -> {
             //noinspection InfiniteLoopStatement
@@ -83,7 +84,7 @@ public class HttpSecServer {
 
         if (args.length > 2) {
             try (InputStream keyStoreIn = new FileInputStream(args[1])) {
-                builder.setKeyStoreStream(keyStoreIn, args[2].toCharArray());
+                builder.setServerKeyStoreStream(keyStoreIn, args[2].toCharArray());
             }
         }
 

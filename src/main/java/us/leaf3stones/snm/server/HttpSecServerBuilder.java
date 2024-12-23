@@ -8,9 +8,14 @@ import us.leaf3stones.snm.rate.UnlimitedRateLimitingPolicy;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 
 public class HttpSecServerBuilder {
     private Integer port;
@@ -45,19 +50,36 @@ public class HttpSecServerBuilder {
         return this;
     }
 
-    public HttpSecServerBuilder setKeyStoreStream(InputStream keyStoreStream, char[] password) {
+    public HttpSecServerBuilder setServerKey(Certificate caCert,
+                                             KeyStore myKeyStore, char[] myKsPassword) {
         try {
-            KeyStore serverKeyStore = KeyStore.getInstance("PKCS12");
-            serverKeyStore.load(keyStoreStream, password);
+            SSLContext sslContext = SSLContext.getInstance("TLS");
 
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-            keyManagerFactory.init(serverKeyStore, password);
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+            keyManagerFactory.init(myKeyStore, myKsPassword);
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+            trustStore.setCertificateEntry("caCert", caCert);
+            tmf.init(trustStore);
+
+            sslContext.init(keyManagerFactory.getKeyManagers(), tmf.getTrustManagers(), null);
             this.sslContext = sslContext;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return this;
+    }
+
+    public HttpSecServerBuilder setServerKeyStoreStream(InputStream keyStoreStream, char[] keystorePass) throws Exception {
+        KeyStore serverKs = KeyStore.getInstance("PKCS12");
+        serverKs.load(keyStoreStream, keystorePass);
+
+        Certificate[] certChain = serverKs.getCertificateChain("1");
+        Certificate caCert = certChain[certChain.length - 1];
+
+        setServerKey(caCert, serverKs, "password".toCharArray());
         return this;
     }
 
@@ -83,8 +105,9 @@ public class HttpSecServerBuilder {
         }
         if (sslContext == null) {
             try (InputStream debugKsIn = HttpSecServerBuilder.class.getResourceAsStream("/server.p12")) {
-                setKeyStoreStream(debugKsIn, "password".toCharArray());
-            } catch (IOException e) {
+                final char[] testKeyStorePassword = "password".toCharArray();
+                setServerKeyStoreStream(debugKsIn, testKeyStorePassword);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
