@@ -6,15 +6,7 @@ A java library that helps you write your own secure network messaging system eff
 
 - [x] custom messages
 
-- [x] secure transport (based on [libsodium](https://doc.libsodium.org/))
-  
-  - [x] confidentiality
-  
-  - [x] integrity
-  
-  - [x] out-of-order messages detection
-  
-  - [x] replay attack detection
+- [x] secure transport (based on [mTLS](https://en.wikipedia.org/wiki/Mutual_authentication))
 
 - [x] rate throttling
 
