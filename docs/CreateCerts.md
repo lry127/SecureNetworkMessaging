@@ -95,6 +95,7 @@ openssl req -new -key server.key -out server.csr \
 openssl x509 -req -in server.csr -CA ../ca/ca.crt -CAkey ../ca/ca.key -CAcreateserial \
   -out server.crt -days 365 -sha256
 openssl pkcs12 -export -out server.p12 -inkey server.key -in server.crt -certfile ../ca/ca.crt -password pass:password
+cd ..
 
 ```
 
