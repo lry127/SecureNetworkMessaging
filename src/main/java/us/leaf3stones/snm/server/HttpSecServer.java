@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
+import java.security.cert.Certificate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,6 +53,8 @@ public class HttpSecServer {
             while (true) {
                 try {
                     SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
+                    clientSocket.getSession().getPeerCertificates(); // eagerly reject clients without certs
+
                     logger.info("accept client from {}", clientSocket.getRemoteSocketAddress().toString().replace('/', ' '));
                     executor.execute(new ClientHandler(clientSocket, executor, handlerFactory, authChain, decoder));
                 } catch (Exception e) {
