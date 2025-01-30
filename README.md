@@ -1,3 +1,6 @@
+# DEPRECATED
+Use [Netty](https://netty.io/) instead, it's excellent.
+
 # SecureNetworkMessaging
 
 A java library that helps you write your own secure network messaging system effortlessly.
