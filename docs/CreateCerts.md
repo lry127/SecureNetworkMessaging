@@ -32,7 +32,7 @@ openssl genrsa -out client.key 2048
 openssl req -new -key client.key -out client.csr \
   -subj "/C=US/CN=$SERVICE_IDENTIFIER Client"
 openssl x509 -req -in client.csr -CA ../ca/ca.crt -CAkey ../ca/ca.key -CAcreateserial \
-  -out client.crt -days 365 -sha256
+  -out client.crt -days 3650 -sha256
 openssl pkcs12 -export -out client.p12 -inkey client.key -in client.crt -certfile ../ca/ca.crt -password pass:password
 cd ..
 ```
