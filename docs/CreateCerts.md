@@ -6,6 +6,9 @@ To do so, it's necessary to create certificates signed by a trusted CA for both 
 
 ```bash
 export SERVICE_IDENTIFIER="Example Service"
+```
+
+```bash
 # ca
 mkdir ca && cd ca
 openssl genrsa -out ca.key 2048 
