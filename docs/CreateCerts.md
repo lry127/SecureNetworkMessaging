@@ -4,6 +4,10 @@
 
 To do so, it's necessary to create certificates signed by a trusted CA for both server and client.
 
+```bash
+export SERVICE_IDENTIFIER="Example Service"
+```
+
 ## 1. Create your own CA
 
 1. create ca dir
@@ -37,7 +41,7 @@ One liner:
 mkdir ca && cd ca
 openssl genrsa -out ca.key 2048 
 openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt \
-  -subj "/C=US/CN=SecureNetworkMessaging Self Trusted"
+  -subj "/C=US/CN=$SERVICE_IDENTIFIER Self Trusted ROOT"
 cd ..
 ```
 
@@ -91,9 +95,9 @@ One liner
 mkdir server && cd server
 openssl genrsa -out server.key 2048
 openssl req -new -key server.key -out server.csr \
-  -subj "/C=US/CN=SecureNetworkMessaging Server #1"
+  -subj "/C=US/CN=$SERVICE_IDENTIFIER Server"
 openssl x509 -req -in server.csr -CA ../ca/ca.crt -CAkey ../ca/ca.key -CAcreateserial \
-  -out server.crt -days 365 -sha256
+  -out server.crt -days 3650 -sha256
 openssl pkcs12 -export -out server.p12 -inkey server.key -in server.crt -certfile ../ca/ca.crt -password pass:password
 cd ..
 
@@ -109,7 +113,7 @@ Nearly identical to creating a server cert, all commands are listed here without
 mkdir client && cd client
 openssl genrsa -out client.key 2048
 openssl req -new -key client.key -out client.csr \
-  -subj "/C=US/CN=SecureNetworkMessaging Client #1"
+  -subj "/C=US/CN=$SERVICE_IDENTIFIER Client"
 openssl x509 -req -in client.csr -CA ../ca/ca.crt -CAkey ../ca/ca.key -CAcreateserial \
   -out client.crt -days 365 -sha256
 openssl pkcs12 -export -out client.p12 -inkey client.key -in client.crt -certfile ../ca/ca.crt -password pass:password
